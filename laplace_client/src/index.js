@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 import { AuthProvider } from "context/auth.js";
 import { AlertProvider } from "context/alert.js";
-import { WSProvider } from "context/websocket.js";
 
 import "assets/css/bootstrap.min.css";
 import "assets/scss/styles.scss";
@@ -29,44 +28,42 @@ ReactDOM.render(
   <AuthProvider>
     <BrowserRouter>
       <AlertProvider>
-        <WSProvider>
+        <Switch>
           <Switch>
-            <Switch>
-              <Route
-                path="/login"
-                render={(props) => <LoginPage {...props} />}
-              />
-              <Route
-                path="/register"
-                render={(props) => <RegisterPage {...props} />}
-              />
-              <Route
-                path="/logout"
-                render={(props) => <LogoutPage {...props} />}
-              />
-              <Route path="/home" render={(props) => <HomePage {...props} />} />
-              <Route path="/profile/:target?" render={(props) => <ProfilePage {...props} />} />
-              <Route path="/ide" render={(props) => <IDEPage {...props} />} />
-              <Route
-                path="/rooms/create"
-                render={(props) => <CreatePage {...props} />}
-              />
-              <Route
-                path="/rooms/edit/:code"
-                render={(props) => <CreatePage {...props} />}
-              />
-              <Route
-                path="/rooms/view/:code"
-                render={(props) => <ViewPage {...props} />}
-              />
-              <Route
-                path="/rooms/list"
-                render={(props) => <ListPage {...props} />}
-              />
-              <Route path="/" render={(props) => <Index {...props} />} />
-            </Switch>
+            <Route
+              path="/login"
+              render={(props) => <LoginPage {...props} />}
+            />
+            <Route
+              path="/register"
+              render={(props) => <RegisterPage {...props} />}
+            />
+            <Route
+              path="/logout"
+              render={(props) => <LogoutPage {...props} />}
+            />
+            <Route path="/home" render={(props) => <HomePage {...props} />} />
+            <Route path="/profile/:target?" render={(props) => <ProfilePage {...props} />} />
+            <Route path="/ide" render={(props) => <IDEPage {...props} />} />
+            <Route
+              path="/rooms/create"
+              render={(props) => <CreatePage {...props} />}
+            />
+            <Route
+              path="/rooms/edit/:code"
+              render={(props) => <CreatePage {...props} />}
+            />
+            <Route
+              path="/rooms/view/:code"
+              render={(props) => <ViewPage {...props} />}
+            />
+            <Route
+              path="/rooms/list"
+              render={(props) => <ListPage {...props} />}
+            />
+            <Route path="/" render={(props) => <Index {...props} />} />
           </Switch>
-        </WSProvider>
+        </Switch>
       </AlertProvider>
     </BrowserRouter>
   </AuthProvider>,

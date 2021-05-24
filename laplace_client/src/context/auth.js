@@ -6,6 +6,7 @@ import { Spinner } from 'reactstrap';
 
 const AuthContext = React.createContext();
 function AuthProvider({children}) {
+  const cookies = new Cookies();
   const [state, setState] = React.useState({
     status: 'pending',
     error: null,
@@ -13,17 +14,35 @@ function AuthProvider({children}) {
   });
 
   React.useEffect(() => {
-  	fetch(process.env.REACT_APP_API_URL + "/api/user/auth", {
-   		method: "POST"
-	  })
+    if(sessionStorage.auth) {
+      try {
+        let data = JSON.parse(sessionStorage.auth);
+        if(data.time && data.time + 1000*60*15 > +new Date() && data.token === cookies.get("authToken")) {
+          setState({status: 'success', error: null, data });
+          return;
+        }
+        else {
+          sessionStorage.removeItem("auth");
+        }
+      }
+      catch(err) {}
+    }
+
+    fetch(process.env.REACT_APP_API_URL + "/api/user/auth", {
+       method: "POST"
+    })
     .then(resp => resp.json())
     .then(json => {
-		  if(json.success) {
-			  setState({status: 'success', error: null, data: {
+      if(json.success) {
+        let data = {
           isSignedIn: true,
           user: json.response.username,
-          email: json.response.email
-        }});
+          email: json.response.email,
+          time: +new Date(),
+          token: cookies.get("authToken")
+        };
+        setState({status: 'success', error: null, data });
+        sessionStorage.auth = JSON.stringify(data);
       }
       else {
         setState({status: 'error', error: json.response, data: {
@@ -35,15 +54,14 @@ function AuthProvider({children}) {
 
   return (
     <AuthContext.Provider value={state}>
-      {state.status === 'pending' ? (<div style={{
-            position: 'absolute', left: '50%', top: '50%',
-            transform: 'translate(-50%, -50%)'
+      {state.status === 'pending' ? (
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)'
         }}>
           <Spinner color="info" style={{ width: '8rem', height: '8rem' }} />
-        </div>)
-        :
-        children
-      }
+        </div>
+      ) : children}
     </AuthContext.Provider>
   )
 }
@@ -53,7 +71,6 @@ function useAuthState() {
   const cookies = new Cookies();
   return {
     status: state.status,
-    token: cookies.get("authToken"),
     ...state.data
   }
 }

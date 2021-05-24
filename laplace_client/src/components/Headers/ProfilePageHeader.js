@@ -12,16 +12,37 @@ function ProfilePageHeader() {
   let pageHeader = React.createRef();
   const { user } = useAuthState();
 
-  const [done, setDone] = React.useState(null);
-  const [joined, setJoined] = React.useState(null);
+  const [done, setDone] = React.useState(0);
+  const [joined, setJoined] = React.useState(0);
 
   React.useEffect(() => {
+    if(sessionStorage.rooms) {
+      try {
+        let data = JSON.parse(sessionStorage.rooms);
+        if(data.time && data.time + 1000*60*3 > +new Date()) {
+          setJoined(data.joined);
+          setDone(data.done);
+          return;
+        }
+        else {
+          sessionStorage.removeItem("rooms");
+        }
+      }
+      catch(err) {}
+    }
+
     fetch(process.env.REACT_APP_API_URL + "/api/user/rooms", {
       method: "POST"
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-        setJoined(json.response.enrolled.length);
-        setDone(json.response.completed.map(t => t.sections.length === t.room.sections.length).filter(Boolean).length);
+        let data = {
+          joined: json.response.enrolled.length,
+          done: json.response.completed.map(t => t.sections.length === t.room.sections.length).filter(Boolean).length,
+          time: +new Date()
+        };
+        sessionStorage.rooms = JSON.stringify(data);
+        setJoined(data.joined);
+        setDone(data.done);
       }
     });
   }, []);

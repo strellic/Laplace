@@ -41,6 +41,9 @@ function EditSection({open, isOpen, submit, section}){
   const [lang, setLang] = React.useState("");
 
   React.useEffect(() => {
+    if(!isOpen)
+      return;
+
     fetch(process.env.REACT_APP_API_URL + "/api/code/langs")
     .then(r => r.json())
     .then(json => {
@@ -55,7 +58,8 @@ function EditSection({open, isOpen, submit, section}){
         setLang(list[0]);
       }
     });
-  }, []);
+  }, [isOpen]);
+
   const showLangModal = () => {
     setSelectOptions({
       title: "Select Language",

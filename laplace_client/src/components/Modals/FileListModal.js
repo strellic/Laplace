@@ -40,6 +40,11 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
     });
   }
 
+  React.useEffect(() => {
+    if(isOpen)
+      refresh();
+  }, [isOpen]);
+
   const update = () => {
     if(Object.keys(response).length === 0)
       return;
@@ -66,10 +71,6 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
   React.useEffect(() => {
     update();
   }, [response, cwd]);
-
-  React.useEffect(() => {
-    refresh();
-  }, []);
 
   const back = () => {
     setCwd(cwd.split("/").slice(0, -1).join("/") || "/");

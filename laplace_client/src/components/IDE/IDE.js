@@ -24,7 +24,6 @@ import IDEFiles from "components/IDE/IDEFiles.js";
 
 import { useAuthState } from "context/auth.js";
 import { useAlertState } from "context/alert.js";
-import { useWSState } from "context/websocket.js";
 
 import storage from "utils/storage.js";
 import fetch from "utils/fetch.js";
@@ -33,7 +32,23 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
   const location = useLocation();
   const { isSignedIn, token } = useAuthState();
   const { setInputOptions, setConfirmOptions, setSelectOptions, setErrorOptions } = useAlertState();
-  const { setStatus, status, ws, connectWS } = useWSState();
+
+  const [status, setStatus] = React.useState("disconnected");
+  const [ws, setWS] = React.useState(null);
+  const connectWS = () => {
+    let socket = new WebSocket(process.env.REACT_APP_API_URL.replace("https", "wss").replace("http", "ws") + "/api/ws");
+    socket.onopen = () => {
+      if(status === "disconnected")
+        setStatus("connected");
+    }
+    socket.onclose = () => {
+      setStatus("disconnected");
+    }
+    setWS(socket);
+  }
+  React.useEffect(() => {
+    connectWS();
+  }, []);
 
   const [loaded, setLoaded] = React.useState(false);
   const [lastPing, setLastPing] = React.useState(null);
@@ -136,10 +151,6 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
     'c': 'text/x-csrc',
     'c++': 'text/x-c++src',
     'c#': 'text/x-csharp',
-    'asm64': {
-      filename: "gas",
-      architecture: "x86"
-    },
     "rust": 'text/x-rustsrc'
   }
 

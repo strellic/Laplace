@@ -172,7 +172,7 @@ function ProfilePage() {
                       src={"https://ui-avatars.com/api/?size=100&name=" + userData.username}
                     ></img>
                     <CardTitle tag="h4">{userData.name ? `${userData.name} (${userData.username})` : userData.username}'s Profile</CardTitle>
-                    <CardText style={{"white-space": "pre-line"}}>
+                    <CardText style={{"whiteSpace": "pre-line"}}>
                       {userData.bio ? userData.bio : "Sadly, we don't have any information about them."}
                     </CardText>
                     <hr />
