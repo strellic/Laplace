@@ -12,8 +12,6 @@ const compare = (input1, input2) => {
 
 const regexCompare = (regex, input, multiline = true, fail = false) => {
 	let r = new RE2(regex);
-	console.log(regex, input, multiline, fail, r.test(input));
-
 	r.multiline = multiline;
 	return (r.test(input) === !fail);
 }
@@ -44,8 +42,6 @@ const coding = (emit, user, room, section, lang, files) => {
 	let failed = 0;
 
 	sandbox.runLang(lang, files, stdins, (result) => {
-		console.log(result);
-
 		if(result.type !== "run")
 			return;
 

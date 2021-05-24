@@ -52,7 +52,7 @@ function IDEPage() {
       if(!folders[i].folder.endsWith("/"))
         folders[i].folder += "/";
     }
-    console.log(folders, base);
+
     setFiles(folders);
     setBase(base);
   }

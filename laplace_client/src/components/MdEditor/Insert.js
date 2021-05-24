@@ -17,14 +17,12 @@ export default class Insert extends PluginComponent {
   }
 
   handleClick() {
-    console.log(this.editor);
     this.setState({
       listOpen: true
     });
   }
 
   handleSubmit(file) {
-    console.log(file.mimetype);
     let url = process.env.REACT_APP_API_URL + "/api/file/" + file.code;
     let insert = `[${file.filename}](${url})\n`;
 

@@ -58,8 +58,6 @@ function SignUp() {
       else {
         setError(json.response);
       }
-
-      console.log(json);
     });
   }
 

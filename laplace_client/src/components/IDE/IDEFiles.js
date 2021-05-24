@@ -88,7 +88,6 @@ function IDEFiles({save, active, setActive, size}) {
 		if(!newOpen.find(o => o.filename === tab.filename && o.folder === tab.folder))
 			newOpen.push({filename: tab.filename, folder: tab.folder});
 
-		console.log(active, {...active, open: newOpen, file: openToFile(tab), folder: tab.folder});
 		setActive({...active, open: newOpen, file: openToFile(tab), folder: tab.folder});
 	}
 
@@ -236,7 +235,6 @@ function IDEFiles({save, active, setActive, size}) {
   const newFile = (name, content = "") => {
     let folder = active.sideFolder || "/";
     name = name.replaceAll("/", "");
-    console.log(active);
     if(active.files.find(f => f.folder === folder).files.find(f => f.filename === name)) {
       return;
     }
@@ -286,7 +284,7 @@ function IDEFiles({save, active, setActive, size}) {
   		submit: (name) => {
 		    name = name.replaceAll("/", "");
 		    let folder = (active.sideFolder || "/") + name + "/";
-		    console.log(active.files);
+
 		    if(active.files.find(f => f.folder === folder)) {
 		      return;
 		    }
