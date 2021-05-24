@@ -6,7 +6,6 @@ import { Spinner } from 'reactstrap';
 
 const AuthContext = React.createContext();
 function AuthProvider({children}) {
-  const cookies = new Cookies();
   const [state, setState] = React.useState({
     status: 'pending',
     error: null,
@@ -14,6 +13,7 @@ function AuthProvider({children}) {
   });
 
   React.useEffect(() => {
+    let cookies = new Cookies();
     if(sessionStorage.auth) {
       try {
         let data = JSON.parse(sessionStorage.auth);
@@ -28,7 +28,7 @@ function AuthProvider({children}) {
       catch(err) {}
     }
 
-    fetch(process.env.REACT_APP_API_URL + "/api/user/auth", {
+    fetch(process.env.REACT_APP_API_URL + "/user/auth", {
        method: "POST"
     })
     .then(resp => resp.json())
@@ -50,7 +50,7 @@ function AuthProvider({children}) {
         }});
       }
     });
-  }, [])
+  }, []);
 
   return (
     <AuthContext.Provider value={state}>
@@ -68,7 +68,6 @@ function AuthProvider({children}) {
 
 function useAuthState() {
   const state = React.useContext(AuthContext);
-  const cookies = new Cookies();
   return {
     status: state.status,
     ...state.data

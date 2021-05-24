@@ -31,7 +31,7 @@ function HomePage() {
   const [completed, setCompleted] = React.useState([]);
 
   const join = (code) => {
-    fetch(process.env.REACT_APP_API_URL + "/api/room/join", {
+    fetch(process.env.REACT_APP_API_URL + "/room/join", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -54,7 +54,7 @@ function HomePage() {
   }
 
   const load = () => {
-    fetch(process.env.REACT_APP_API_URL + "/api/user/rooms", {
+    fetch(process.env.REACT_APP_API_URL + "/user/rooms", {
       method: "POST"
     }).then(resp => resp.json()).then(json => {
       if(json.success) {

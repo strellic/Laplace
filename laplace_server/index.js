@@ -18,7 +18,10 @@ sockets.configure(wss);
 
 import authenticate from "./src/authenticate.js";
 
-import apiRouter from "./routes/api.js";
+import userRouter from "./routes/user.js";
+import roomRouter from "./routes/room.js";
+import codeRouter from "./routes/code.js";
+import fileRouter from "./routes/file.js";
 
 mongoose.connect(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_IP}/${process.env.MONGO_DBNAME}`,
 	{useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}
@@ -42,9 +45,17 @@ app.use((req, res, next) => {
 	next();
 });
 
+app.use("/user", userRouter);
+app.use("/room", roomRouter);
+app.use("/code", codeRouter);
+app.use("/file", fileRouter);
 
-app.use("/schemas", express.static('src/schemas/'));
-app.use("/api", apiRouter);
+app.get("/version", async (req, res) => {
+    res.json({
+        "success": true,
+        "version": 1.0
+    });
+});
 
 app.get("/", (req, res) => {
 	res.send("Laplace API Server");
@@ -53,7 +64,7 @@ app.get("/", (req, res) => {
 server.on('upgrade', function upgrade(request, socket, head) {
 	const pathname = url.parse(request.url).pathname;
 
-	if (pathname === '/api/ws') {
+	if (pathname === '/ws') {
 		wss.handleUpgrade(request, socket, head, function done(ws) {
 			wss.emit('connection', ws, request);
 		});

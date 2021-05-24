@@ -1,7 +1,7 @@
 import express from "express";
 
-import response from "../../src/response.js";
-import sandbox from "../../src/sandbox.js";
+import response from "../src/response.js";
+import sandbox from "../src/sandbox.js";
 
 const router = express.Router();
 

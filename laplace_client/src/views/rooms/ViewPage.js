@@ -6,11 +6,9 @@ import {
   Row,
   Col,
   Spinner,
-  Container,
   Button,
   Form,
   FormGroup,
-  Label,
   Input
 } from "reactstrap";
 
@@ -48,8 +46,34 @@ function ViewPage() {
 
   let storageKey = `rooms.${room.code}.num`;
 
+  const checkCompletion = React.useCallback((room, section, force = false) => {
+    // if author viewing, checks will be the array of test cases
+    // if student viewing, checks will be a boolean
+    let hasChecks = (Array.isArray(section.checks) && section.checks.length > 0)
+                    || (!Array.isArray(section.checks) && section.checks);  
+
+    if(!section.completed || force) {
+      if(section.type === "info" || (section.type === "jsapp" && force) || (section.type === "coding" && !hasChecks) || (section.type === "quiz" && answer) || (section.type === "flag" && flag)) {
+        fetch(process.env.REACT_APP_API_URL + "/room/complete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ room: room.code, section: section.code, answer, flag })
+        }).then(resp => resp.json()).then(json => {
+          if(json.success) {
+            complete(room, section, section.type === "info" || (section.type === "coding" && !hasChecks));
+          }
+          else {
+            setMessageOptions({title: "Info", body: json.response});
+          }
+        });
+      }
+    }
+  }, [answer, flag, setMessageOptions]);
+
   React.useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/api/room/info", {
+    fetch(process.env.REACT_APP_API_URL + "/room/info", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -95,7 +119,7 @@ function ViewPage() {
         window.location = "/home";
       }
     });
-  }, []);
+  }, [code, checkCompletion, setErrorOptions]);
 
   React.useEffect(() => {
     if(section.type === "jsapp" && !iframeRef.current.src) {
@@ -105,7 +129,7 @@ function ViewPage() {
           file = section.files.find(f => f.folder === "/").files.find(f => f.filename === "index.html");
         else
           file = section.files[0].files[0];
-        iframeRef.current.src = process.env.REACT_APP_API_URL + "/api/file/" + file.code;
+        iframeRef.current.src = process.env.REACT_APP_API_URL + "/file/" + file.code;
       }
       window.onmessage = (e) => {
         if(e.origin === process.env.REACT_APP_API_URL) {
@@ -115,33 +139,7 @@ function ViewPage() {
         }
       }
     }
-  }, [iframeRef]);
-
-  const checkCompletion = (room, section, force = false) => {
-    // if author viewing, checks will be the array of test cases
-    // if student viewing, checks will be a boolean
-    let hasChecks = (Array.isArray(section.checks) && section.checks.length > 0)
-                    || (!Array.isArray(section.checks) && section.checks);  
-
-    if(!section.completed || force) {
-      if(section.type === "info" || (section.type === "jsapp" && force) || (section.type === "coding" && !hasChecks) || (section.type === "quiz" && answer) || (section.type === "flag" && flag)) {
-        fetch(process.env.REACT_APP_API_URL + "/api/room/complete", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ room: room.code, section: section.code, answer, flag })
-        }).then(resp => resp.json()).then(json => {
-          if(json.success) {
-            complete(room, section, section.type === "info" || (section.type === "coding" && !hasChecks));
-          }
-          else {
-            setMessageOptions({title: "Info", body: json.response});
-          }
-        });
-      }
-    }
-  }
+  }, [iframeRef, room, section, checkCompletion]);
 
   const complete = (room, section, noConfetti = false) => {
     if(!noConfetti) {
@@ -161,7 +159,7 @@ function ViewPage() {
       setSection(room.sections[num]);
       checkCompletion(room, room.sections[num]);
     }
-  }, [num]);
+  }, [num, checkCompletion, loaded, room, storageKey]);
 
   if(!isSignedIn) {
     window.location = "/";
@@ -211,6 +209,7 @@ function ViewPage() {
                   <img
                     className="room-laplace"
                     src={require("assets/img/logo.png")}
+                    alt="Laplace logo"
                   ></img>
                 </Col>
               </>
@@ -296,7 +295,7 @@ function ViewPage() {
                   {RoomButtons(num)}
                 </Col>
                 <Col className="bg-white col-6 p-0">
-                  <iframe className="jsapp-iframe w-100 h-100 border-0" ref={iframeRef}></iframe>
+                  <iframe className="jsapp-iframe w-100 h-100 border-0" ref={iframeRef} title="Interactive application"></iframe>
                 </Col>
               </>
             )}

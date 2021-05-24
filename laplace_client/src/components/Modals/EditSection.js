@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 // core components
 import MarkdownIt from 'markdown-it'
-import MdEditor, { Plugins } from 'react-markdown-editor-lite'
+import MdEditor from 'react-markdown-editor-lite'
 import 'react-markdown-editor-lite/lib/index.css';
 
 import Insert from "components/MdEditor/Insert.js";
@@ -44,7 +44,7 @@ function EditSection({open, isOpen, submit, section}){
     if(!isOpen)
       return;
 
-    fetch(process.env.REACT_APP_API_URL + "/api/code/langs")
+    fetch(process.env.REACT_APP_API_URL + "/code/langs")
     .then(r => r.json())
     .then(json => {
       let list = json.response;
@@ -58,7 +58,7 @@ function EditSection({open, isOpen, submit, section}){
         setLang(list[0]);
       }
     });
-  }, [isOpen]);
+  }, [isOpen, section.lang]);
 
   const showLangModal = () => {
     setSelectOptions({
@@ -308,7 +308,7 @@ function EditSection({open, isOpen, submit, section}){
 	          					<i className="fas fa-folder"></i> {folder.folder}
 	          					{folder.files.map((file, j) => (
 	          						<div key={j} className="ml-3">
-	          							<i className="fas fa-file"></i> <a href={process.env.REACT_APP_API_URL + "/api/file/" + file.code}>{file.filename}</a>
+	          							<i className="fas fa-file"></i> <a href={process.env.REACT_APP_API_URL + "/file/" + file.code}>{file.filename}</a>
 	          						</div>
 	          					))}
 	          				</div>

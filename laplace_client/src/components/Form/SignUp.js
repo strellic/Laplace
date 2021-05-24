@@ -51,7 +51,7 @@ function SignUp() {
       return setError("The passwords are not the same!");
     }
 
-    fetch(process.env.REACT_APP_API_URL + '/api/user/register', {
+    fetch(process.env.REACT_APP_API_URL + '/user/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

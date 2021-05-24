@@ -1,14 +1,7 @@
 import React from "react";
 // reactstrap components
 import {
-  Row,
-  Col,
-  Spinner,
-  Container,
-  Button,
-  Form,
-  FormGroup,
-  Label
+  Row
 } from "reactstrap";
 
 import { useLocation } from "react-router-dom";
@@ -17,11 +10,9 @@ import { useAuthState } from "context/auth.js";
 import { useAlertState } from "context/alert.js";
 
 import fetch from "utils/fetch.js";
-import storage from "utils/storage.js";
 
 // core components
 import Navbar from "components/Navbars/Navbar.js";
-import Markdown from "components/Markdown.js";
 import IDE from "components/IDE/IDE.js";
 
 function IDEPage() {
@@ -41,7 +32,7 @@ function IDEPage() {
       title: "Select Folder",
       submitFolder: loadFolder
     });
-  }, []);
+  }, [collab, setFileListOptions]);
 
   const loadFolder = (folders, base) => {
     if(base !== "/") {
@@ -65,7 +56,7 @@ function IDEPage() {
           folders[i].folder = folders[i].folder.slice(0, -1);
       }
 
-      fetch(process.env.REACT_APP_API_URL + "/api/file/update", {
+      fetch(process.env.REACT_APP_API_URL + "/file/update", {
         method: "POST",
         body: JSON.stringify({ data: folders })
       })

@@ -31,7 +31,7 @@ function ProfilePageHeader() {
       catch(err) {}
     }
 
-    fetch(process.env.REACT_APP_API_URL + "/api/user/rooms", {
+    fetch(process.env.REACT_APP_API_URL + "/user/rooms", {
       method: "POST"
     }).then(resp => resp.json()).then(json => {
       if(json.success) {

@@ -3,7 +3,6 @@ import React from "react";
 // reactstrap components
 import {
   Container,
-  Row,
   Button,
   Input,
   FormGroup
@@ -42,7 +41,7 @@ function ListPage() {
   }, []);
 
   React.useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/api/room/list", {
+    fetch(process.env.REACT_APP_API_URL + "/room/list", {
       method: "GET"
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
@@ -62,7 +61,7 @@ function ListPage() {
   }
 
   const join = (code) => {
-    fetch(process.env.REACT_APP_API_URL + "/api/room/join", {
+    fetch(process.env.REACT_APP_API_URL + "/room/join", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -81,7 +80,7 @@ function ListPage() {
   const columns = [
     {title: "Title", field: "title"},
     {title: "Author", field: "author", formatter: (item) => (
-      <a href={"/profile/" + item.author} target="_blank">{item.author}</a>
+      <a href={"/profile/" + item.author} target="_blank" rel="noopener noreferrer">{item.author}</a>
     )},
     {title: "Code", field: "code"},
     {title: "Description", field: "desc"},

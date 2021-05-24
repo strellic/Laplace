@@ -3,10 +3,8 @@ import { FileIcon } from 'react-file-icon';
 
 // reactstrap components
 import { 
-  Input,
   Button,
   Modal,
-  FormGroup,
   Row,
   Col,
   Container,
@@ -27,8 +25,8 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
 
   const { setConfirmOptions, setErrorOptions, setMessageOptions, setDragDropOptions, setInputOptions } = useAlertState();
 
-  const refresh = () => {
-    fetch(process.env.REACT_APP_API_URL + "/api/file/list", {
+  const refresh = React.useCallback(() => {
+    fetch(process.env.REACT_APP_API_URL + "/file/list", {
       method: "POST",
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
@@ -38,14 +36,14 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
         open(false);
       }
     });
-  }
+  }, [open]);
 
   React.useEffect(() => {
     if(isOpen)
       refresh();
-  }, [isOpen]);
+  }, [isOpen, refresh]);
 
-  const update = () => {
+  const update = React.useCallback(() => {
     if(Object.keys(response).length === 0)
       return;
 
@@ -64,18 +62,18 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
 
     let subfolders = response.map(s => s.folder).filter(f => f !== cwd && f.startsWith(cwd) && f.split("/").length === base.split("/").length + 1);
     setFolders(subfolders);
-  }
+  }, [cwd, response]);
 
   React.useEffect(() => {
     update();
-  }, [response, cwd]);
+  }, [response, cwd, update]);
 
   const back = () => {
     setCwd(cwd.split("/").slice(0, -1).join("/") || "/");
   }
 
   const copyFile = (i) => {
-    navigator.clipboard.writeText(process.env.REACT_APP_API_URL + "/api/file/" + files[i].code);
+    navigator.clipboard.writeText(process.env.REACT_APP_API_URL + "/file/" + files[i].code);
     setMessageOptions({body: "File URL copied to clipboard."});
   };
 
@@ -85,7 +83,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
       body: `Are you sure you want to delete ${files[i].filename}?`,
       submit: (status) => {
         if(status) {
-          fetch(process.env.REACT_APP_API_URL + "/api/file/delete", {
+          fetch(process.env.REACT_APP_API_URL + "/file/delete", {
             method: "POST",
             body: JSON.stringify({ code: files[i].code, folder: cwd }),
           }).then(r => r.json()).then(json => {
@@ -107,7 +105,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
       body: `Are you sure you want to delete ${folder.split("/").pop()}?`,
       submit: (status) => {
         if(status) {
-          fetch(process.env.REACT_APP_API_URL + "/api/file/del_folder", {
+          fetch(process.env.REACT_APP_API_URL + "/file/del_folder", {
             method: "POST",
             body: JSON.stringify({ folder }),
           }).then(r => r.json()).then(json => {
@@ -132,7 +130,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
       formData.append("file", file);
       formData.append("folder", cwd);
 
-      fetch(process.env.REACT_APP_API_URL + "/api/file/upload", {
+      fetch(process.env.REACT_APP_API_URL + "/file/upload", {
         method: 'POST',
         body: formData
       }).then(r => r.json()).then(json => {
@@ -148,7 +146,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
   const newFolder = (folder) => {
     let newPath = cwd.split("/").concat([folder.replace(/\//g, "").trim()]).join("/").replace(/\/\/+/g, '/');
     if(folder) {
-      fetch(process.env.REACT_APP_API_URL + "/api/file/new_folder", {
+      fetch(process.env.REACT_APP_API_URL + "/file/new_folder", {
         method: 'POST',
         body: JSON.stringify({ folder: newPath })
       }).then(r => r.json()).then(json => {

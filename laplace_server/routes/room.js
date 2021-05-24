@@ -3,13 +3,13 @@ import express from "express";
 import Ajv from 'ajv'
 import fs from "fs";
 
-import Section from "../../models/Section.js";
-import Room from "../../models/Room.js";
-import User from "../../models/User.js";
+import Section from "../models/Section.js";
+import Room from "../models/Room.js";
+import User from "../models/User.js";
 
-import authenticate from "../../src/authenticate.js";
-import response from "../../src/response.js";
-import check from "../../src/check.js";
+import authenticate from "../src/authenticate.js";
+import response from "../src/response.js";
+import check from "../src/check.js";
 
 const router = express.Router();
 

@@ -1,12 +1,9 @@
 import React from "react";
 import {Controlled as CodeMirror} from 'react-codemirror2';
-import { useLocation } from "react-router-dom";
 
 import {
-  Row,
   Col,
   Spinner,
-  Container,
   Button,
   UncontrolledTooltip,
   Badge
@@ -29,14 +26,13 @@ import storage from "utils/storage.js";
 import fetch from "utils/fetch.js";
 
 function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room, section, files, lang, collabCode, base, size="normal", onSave = () => {}, onComplete = () => {}}) {
-  const location = useLocation();
   const { isSignedIn, token } = useAuthState();
   const { setInputOptions, setConfirmOptions, setSelectOptions, setErrorOptions } = useAlertState();
 
   const [status, setStatus] = React.useState("disconnected");
   const [ws, setWS] = React.useState(null);
-  const connectWS = () => {
-    let socket = new WebSocket(process.env.REACT_APP_API_URL.replace("https", "wss").replace("http", "ws") + "/api/ws");
+  const connectWS = React.useCallback(() => {
+    let socket = new WebSocket(process.env.REACT_APP_API_URL.replace("https", "wss").replace("http", "ws") + "/ws");
     socket.onopen = () => {
       if(status === "disconnected")
         setStatus("connected");
@@ -45,13 +41,10 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
       setStatus("disconnected");
     }
     setWS(socket);
-  }
+  }, [status]);
   React.useEffect(() => {
     connectWS();
-  }, []);
-
-  const [loaded, setLoaded] = React.useState(false);
-  const [lastPing, setLastPing] = React.useState(null);
+  }, [connectWS]);
 
   const [active, setActive] = React.useState({
     files: [],
@@ -122,7 +115,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         }
       }
     }
-  }, [ws]);
+  }, [ws, onComplete, setErrorOptions, setInputOptions]);
 
   React.useEffect(() => {
     if(!section || !collab || status === "disconnected")
@@ -131,7 +124,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
       type: "collab",
       meta: "leave"
     }))
-  }, [section]);
+  }, [collab, status, ws, section]);
 
   React.useEffect(() => {
     if(status === "connected" && collabCode && !collab) {
@@ -142,7 +135,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         code: collabCode
       }));
     }
-  }, [status]);
+  }, [collab, status, collabCode, ws]);
 
   const syntaxTable = {
     'python': 'text/x-python',
@@ -154,25 +147,26 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
     "rust": 'text/x-rustsrc'
   }
 
-  const loadFiles = async () => {
-    for(let location of files) {
-      for(let i = 0; i < location.files.length; i++) {
-        if(!location.folder.endsWith("/"))
-          location.folder += "/";
-        location.files[i].content = await (await fetch(process.env.REACT_APP_API_URL + "/api/file/" + location.files[i].code)).text();
-      }
-    }
-    return files;
-  }
-
   React.useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/api/code/langs")
+    fetch(process.env.REACT_APP_API_URL + "/code/langs")
     .then(resp => resp.json())
     .then(async (json) => {
       if(json.success) {
         let langs = json.response;
-        if(lang)
-          langs = [json.response.find(l => l.lang == lang)];
+        if(lang) {
+          langs = [json.response.find(l => l.lang === lang)];
+        }
+
+        const loadFiles = async () => {
+          for(let location of files) {
+            for(let i = 0; i < location.files.length; i++) {
+              if(!location.folder.endsWith("/"))
+                location.folder += "/";
+              location.files[i].content = await (await fetch(process.env.REACT_APP_API_URL + "/file/" + location.files[i].code)).text();
+            }
+          }
+          return files;
+        }
 
         if(files && files.length !== 0) {
           let data = await loadFiles();
@@ -219,7 +213,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         window.location = "/home";
       }
     });
-  }, [files]);
+  }, [files, collabCode, lang, storageKey, useFileStorage]);
 
   React.useEffect(() => {
     function handleResize() {
@@ -229,6 +223,13 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         height -= navbarRef.current.parentElement.parentElement.offsetHeight;
         height -= codeBottomRef.current.offsetHeight;
         height -= codeTopRef.current.offsetHeight;
+
+        let prevHeight = document.getElementsByClassName("react-codemirror2")[0].style.height;
+        if(Math.abs(height - parseInt(prevHeight)) < 10) {
+          // skip resizing unless large height difference
+          return;
+        }
+
         height += "px";
 
         document.getElementsByClassName("react-codemirror2")[0].style.height = height;
@@ -238,7 +239,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, [navbarRef, codeBottomRef]);
+  }, [navbarRef, codeBottomRef, codeTopRef]);
 
   React.useEffect(() => {
     if(!useFileStorage && storageKey && active && active.loaded && active.file && active.files) {
@@ -254,7 +255,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
       }));
     }
     transferred.current = false;
-  }, [active]);
+  }, [active, collab, status, storageKey, ws, useFileStorage]);
 
   const run = () => {
     setActive(prev => ({...prev, output: []}));

@@ -25,9 +25,6 @@ import DefaultFooter from "components/Footers/DefaultFooter.js";
 
 import SectionCard from "components/Cards/SectionCard.js";
 
-import MessageModal from "components/Modals/MessageModal.js";
-import ErrorModal from "components/Modals/ErrorModal.js";
-
 import PaginatedTable from "components/Form/PaginatedTable.js";
 
 import CreateSection from "components/Modals/CreateSection.js";
@@ -111,7 +108,7 @@ function CreatePage() {
 
   const saveRoom = () => {
     let roomData = { title, desc, sections: sectionsRef.current, "public": isPublic };
-    fetch(process.env.REACT_APP_API_URL + (isEditing ? "/api/room/edit" : "/api/room/create"), {
+    fetch(process.env.REACT_APP_API_URL + (isEditing ? "/room/edit" : "/room/create"), {
       method: "POST",
       headers: {
           "Content-Type": "application/json"
@@ -122,13 +119,13 @@ function CreatePage() {
         setMessageOptions({body: json.response, submit: () => {window.location = "/home";}});
       }
       else {
-        setErrorOptions({body: json.response, submit: () => {window.location = "/home";}});
+        setErrorOptions({body: json.response});
       }
     });
   }
 
   const deleteRoom = () => {
-    fetch(process.env.REACT_APP_API_URL + "/api/room/delete", {
+    fetch(process.env.REACT_APP_API_URL + "/room/delete", {
       method: "POST",
       headers: {
           "Content-Type": "application/json"
@@ -164,7 +161,7 @@ function CreatePage() {
     document.body.scrollTop = 0;
 
     if(isEditing) {
-      fetch(process.env.REACT_APP_API_URL + `/api/room/info`, {
+      fetch(process.env.REACT_APP_API_URL + `/room/info`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -196,7 +193,7 @@ function CreatePage() {
       document.body.classList.remove("profile-page");
       document.body.classList.remove("sidebar-collapse");
     };
-  }, [code, isEditing]);
+  }, [code, isEditing, user, setErrorOptions]);
 
   React.useEffect(() => {
     sectionsRef.current = sections;
@@ -279,7 +276,7 @@ function CreatePage() {
                 <PaginatedTable
                   columns={[
                     {title: "Username", field: "username", formatter: (item) => (
-                      <a href={"/profile/" + item.username} target="_blank">{item.username}</a>
+                      <a href={"/profile/" + item.username} target="_blank" rel="noopener noreferrer">{item.username}</a>
                     )},
                     {title: "Completion", field: "completed", formatter: (item) => (
                       <>{item.completed ? item.completed.length : 0} / {sections.length} sections</>

@@ -40,7 +40,7 @@ function SignUp() {
 
     setDisabled(true);
 
-    fetch(process.env.REACT_APP_API_URL + '/api/user/login', {
+    fetch(process.env.REACT_APP_API_URL + '/user/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

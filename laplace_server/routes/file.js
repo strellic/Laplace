@@ -4,9 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import mime from 'mime';
 
-import authenticate from "../../src/authenticate.js";
-import response from "../../src/response.js";
-import File from "../../models/File.js";
+import authenticate from "../src/authenticate.js";
+import response from "../src/response.js";
+import File from "../models/File.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });

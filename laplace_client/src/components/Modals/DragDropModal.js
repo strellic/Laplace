@@ -2,10 +2,8 @@ import React from "react";
 import {useDropzone} from 'react-dropzone';
 // reactstrap components
 import { 
-  Input,
   Button,
-  Modal,
-  FormGroup
+  Modal
 } from "reactstrap";
 // core components
 
@@ -42,7 +40,6 @@ function DragDropModal({open, isOpen, submit, title="Upload Files", type="text",
     getRootProps,
     getInputProps,
     acceptedFiles,
-    fileRejections,
     isDragActive,
     isDragAccept,
     isDragReject
@@ -51,17 +48,6 @@ function DragDropModal({open, isOpen, submit, title="Upload Files", type="text",
   const acceptedFileItems = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
-    </li>
-  ));
-
-  const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-    <li key={file.path}>
-      {file.path} - {file.size} bytes
-      <ul>
-        {errors.map(e => (
-          <li key={e.code}>{e.message}</li>
-        ))}
-      </ul>
     </li>
   ));
 

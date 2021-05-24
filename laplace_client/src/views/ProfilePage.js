@@ -41,7 +41,7 @@ function ProfilePage() {
   const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/api/user/info?username=" + encodeURIComponent(target), {
+    fetch(process.env.REACT_APP_API_URL + "/user/info?username=" + encodeURIComponent(target), {
       method: "GET"
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
@@ -54,7 +54,7 @@ function ProfilePage() {
         }});
       }
     });
-  }, []);
+  }, [target, setErrorOptions]);
 
   const [ info, setInfo ] = React.useState({});
   const [ pass, setPass ] = React.useState({});
@@ -63,7 +63,7 @@ function ProfilePage() {
   const updateInfo = (e) => {
     e.preventDefault();
 
-    fetch(process.env.REACT_APP_API_URL + '/api/user/update_info', {
+    fetch(process.env.REACT_APP_API_URL + '/user/update_info', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -92,7 +92,7 @@ function ProfilePage() {
 
   const changePass = (e) => {
     e.preventDefault();
-    fetch(process.env.REACT_APP_API_URL + '/api/user/update_pass', {
+    fetch(process.env.REACT_APP_API_URL + '/user/update_pass', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ function ProfilePage() {
 
   const changeBio = (e) => {
     e.preventDefault();
-    fetch(process.env.REACT_APP_API_URL + '/api/user/update_bio', {
+    fetch(process.env.REACT_APP_API_URL + '/user/update_bio', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -139,7 +139,7 @@ function ProfilePage() {
   }
 
   const changePic = (file) => {
-    fetch(process.env.REACT_APP_API_URL + '/api/user/update_pic', {
+    fetch(process.env.REACT_APP_API_URL + '/user/update_pic', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -193,11 +193,12 @@ function ProfilePage() {
                     <img
                       className="rounded-circle"
                       src={userData.profilepic ?
-                        process.env.REACT_APP_API_URL + '/api/file/' + userData.profilepic
-                        : "https://ui-avatars.com/api/?name=" + userData.username
+                        process.env.REACT_APP_API_URL + '/file/' + userData.profilepic
+                        : "https://ui-avatars.com/?name=" + userData.username
                       }
                       style={{"width": "8rem"}}
-                      onError={() => this.src = "https://ui-avatars.com/api/?name=" + userData.username}
+                      onError={() => this.src = "https://ui-avatars.com/?name=" + userData.username}
+                      alt={userData.username + "'s profile picture"}
                     ></img>
                     <CardTitle tag="h4">{userData.name ? `${userData.name} (${userData.username})` : userData.username}'s Profile</CardTitle>
                     <CardText style={{"whiteSpace": "pre-line"}}>

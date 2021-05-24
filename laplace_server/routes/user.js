@@ -3,11 +3,11 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import passport from "passport";
 
-import User from "../../models/User.js";
-import File from "../../models/File.js";
-import authenticate from "../../src/authenticate.js";
+import User from "../models/User.js";
+import File from "../models/File.js";
+import authenticate from "../src/authenticate.js";
 
-import response from "../../src/response.js";
+import response from "../src/response.js";
 
 const router = express.Router();
 
