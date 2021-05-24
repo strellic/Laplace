@@ -50,8 +50,10 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
       total += response[i].files.reduce((t, c) => t + c.size, 0);
     }
 
+    console.log(cwd, response, response.find(s => s.folder === cwd));
+
     setSpace((total / max)*100);
-    setFiles(response.find(s => s.folder === cwd).files);
+    setFiles(response.find(s => s.folder === cwd)?.files || []);
 
     let base = cwd;
     if(base === "/")
@@ -234,10 +236,6 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
               ))}
               {(cwd === "/" && files && files.length >= 0 && submitFolder) && (
                 <Button size="sm" color="info" onClick={() => {submitFolder(JSON.parse(JSON.stringify(response.filter(s => s.folder.startsWith(cwd)))), cwd); open(false);}}>Select /</Button>
-  
-              )}
-              {(cwd === "/" && files && files.length === 0) && (
-                <h5>You have no files uploaded.</h5>
               )}
             </Row>
             <Row>

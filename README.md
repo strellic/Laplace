@@ -8,6 +8,7 @@ These students can program and build in a variety of different programming langu
 
 ## Features
 * Interactive Code IDE
+* File upload & storage
 * Support for programming test cases & style checks
 * Custom questions
 * Support for custom JavaScript apps for interactive games
@@ -46,4 +47,4 @@ From there, follow the setup instructions in each of the folders.
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
-[https://choosealicense.com/licenses/mit/](MIT)
+[MIT](https://choosealicense.com/licenses/mit/)

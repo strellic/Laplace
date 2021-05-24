@@ -26,7 +26,7 @@ function EditSection({open, isOpen, submit, section}){
   const [markdown, setMarkdown] = React.useState(section.markdown || "");
   const [type, setType] = React.useState(section.type || "info");
 
-  const validTypes = ["info", "coding", "quiz", "flag", "jsapp"/*, "web"*/];
+  const validTypes = ["info", "coding", "quiz", "flag", "jsapp"];
 
   const [checks, setChecks] = React.useState(section.checks || []);
 
