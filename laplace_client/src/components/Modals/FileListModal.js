@@ -55,8 +55,6 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
       total += response[i].files.reduce((t, c) => t + c.size, 0);
     }
 
-    console.log(cwd, response, response.find(s => s.folder === cwd));
-
     setSpace((total / max)*100);
     setFiles(response.find(s => s.folder === cwd)?.files || []);
 

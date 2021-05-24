@@ -49,6 +49,9 @@ const userSchema = Schema({
         type: String,
         maxlength: 300
     },
+    profilepic: {
+        type: String
+    },
     storage: [{
         folder: {
             type: String,

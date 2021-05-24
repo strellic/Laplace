@@ -28,7 +28,7 @@ import ProfilePageHeader from "components/Headers/ProfilePageHeader.js";
 import DefaultFooter from "components/Footers/DefaultFooter.js";
 
 function ProfilePage() {
-  const { setMessageOptions, setErrorOptions } = useAlertState();
+  const { setMessageOptions, setErrorOptions, setFileListOptions } = useAlertState();
   const { isSignedIn, user, email } = useAuthState();
   const cookies = new Cookies();
   let { target } = useParams();
@@ -138,6 +138,29 @@ function ProfilePage() {
     });
   }
 
+  const changePic = (file) => {
+    fetch(process.env.REACT_APP_API_URL + '/api/user/update_pic', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ code: file.code })
+    })
+    .then(resp => resp.json())
+    .then(json => {
+      if(!json.success) {
+        return setErrorOptions({body: json.response, submit: () => {
+          window.location = "/profile";
+        }});
+      }
+      else {
+        setMessageOptions({ body: json.response, submit: () => {
+          window.location = "/profile";
+        }});
+      }
+    });
+  };
+
   React.useEffect(() => {
     document.body.classList.add("profile-page");
     document.body.classList.add("sidebar-collapse");
@@ -169,7 +192,12 @@ function ProfilePage() {
                   <CardBody>
                     <img
                       className="rounded-circle"
-                      src={"https://ui-avatars.com/api/?size=100&name=" + userData.username}
+                      src={userData.profilepic ?
+                        process.env.REACT_APP_API_URL + '/api/file/' + userData.profilepic
+                        : "https://ui-avatars.com/api/?name=" + userData.username
+                      }
+                      style={{"width": "8rem"}}
+                      onError={() => this.src = "https://ui-avatars.com/api/?name=" + userData.username}
                     ></img>
                     <CardTitle tag="h4">{userData.name ? `${userData.name} (${userData.username})` : userData.username}'s Profile</CardTitle>
                     <CardText style={{"whiteSpace": "pre-line"}}>
@@ -232,6 +260,14 @@ function ProfilePage() {
                           </FormGroup>
                         </Col>
                       </Row>
+                      <Button
+                        color="primary"
+                        type="button"
+                        size="sm"
+                        onClick={() => setFileListOptions({title: "Select new profile picture:", submit: changePic})}
+                      >
+                        Change Profile Picture
+                      </Button>
                       <Button
                         color="info"
                         type="submit"
