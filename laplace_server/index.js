@@ -24,8 +24,8 @@ mongoose.connect(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@
 	{useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}
 );
 
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false, limit: '16mb' }));
+app.use(bodyParser.json({ limit: '16mb'}));
 
 app.use(cors({
 	origin: process.env.ORIGIN

@@ -36,6 +36,11 @@ const roomSchema = Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    public: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 });
 
 roomSchema.plugin(uniqueValidator);

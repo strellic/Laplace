@@ -36,16 +36,19 @@ router.get("/info", async (req, res) => {
 		return res.json(response.failure("Username must be 6 characters at minimum."));
 	}
 
-	User.findOne({ username: username }, (err, user) => {
-      	if (err || !user) {
-      		return res.json(response.failure("No user found with that username."));
-      	}
-      	return res.json(response.success({
-			"username": user.username,
-			"name": user.name || "",
-			"bio": user.bio || "",
-		}));
-    });
+    let user = await authenticate.getUser({ username }, ["rooms"]);
+    if(!user) {
+        return res.json(response.failure("No user found with that username."));
+    }
+
+    return res.json(response.success({
+		username: user.username,
+		name: user.name || "",
+		bio: user.bio || "",
+        enrolled: user.enrolled.length, 
+        created: user.created.length,
+        completed: user.completed.length
+	}));
 });
 
 router.post("/update_info", authenticate.requiresLogin, async (req, res) => {
@@ -55,18 +58,23 @@ router.post("/update_info", authenticate.requiresLogin, async (req, res) => {
 
 	let user = req.user;
 
-    if (user.username != username) {
+    if (user.username !== username) {
 		if(username.length < 6) {
 			return res.json(response.failure("Username must be 6 characters at minimum."));
 		}
+
+        if(await authenticate.getUser({username})) {
+            return res.json(response.failure("A user already exists with that username."));
+        }
+
 		user.username = username;
 	}
 
-	if (user.name != name) {
+	if (user.name !== name) {
 		user.name = name;
 	}
 		
-	if (user.email != email) {
+	if (user.email !== email) {
 		if(!validator.isEmail(email)) {
 			return res.json(response.failure("Invalid email address."));
 		}
@@ -108,8 +116,6 @@ router.post("/update_pass", authenticate.requiresLogin, async (req, res) => {
 
 router.post("/update_bio", authenticate.requiresLogin, async (req, res) => {
 	let bio = req.body.bio;
-	let newPassword = req.body.newPassword;
-
 	let user = req.user;
 
     user.bio = bio;

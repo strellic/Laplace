@@ -8,7 +8,8 @@ import {
   Col,
   Input,
   Form,
-  FormGroup
+  FormGroup,
+  Label
 } from "reactstrap";
 import { sortableContainer, sortableElement } from 'react-sortable-hoc';
 
@@ -27,13 +28,15 @@ import SectionCard from "components/Cards/SectionCard.js";
 import MessageModal from "components/Modals/MessageModal.js";
 import ErrorModal from "components/Modals/ErrorModal.js";
 
+import PaginatedTable from "components/Form/PaginatedTable.js";
+
 import CreateSection from "components/Modals/CreateSection.js";
 import EditSection from "components/Modals/EditSection.js";
 import ExportModal from "components/Modals/ExportModal.js";
 import ImportModal from "components/Modals/ImportModal.js";
 
 function CreatePage() {
-  const { isSignedIn } = useAuthState();
+  const { user, isSignedIn } = useAuthState();
   const { setErrorOptions, setMessageOptions } = useAlertState();
 
   const isEditing = useLocation().pathname.startsWith("/rooms/edit/");
@@ -41,6 +44,10 @@ function CreatePage() {
 
   const [title, setTitle] = React.useState("");
   const [desc, setDesc] = React.useState("");
+
+  const [members, setMembers] = React.useState([]);
+
+  const [isPublic, setPublic] = React.useState(false);
 
   const [createModal, setCreateModal] = React.useState(false);
   const [editModal, setEditModal] = React.useState(false);
@@ -96,10 +103,14 @@ function CreatePage() {
     setTitle(data.title);
     setDesc(data.desc);
     setSections(data.sections);
+    setPublic(data.public);
+
+    if(data.members)
+      setMembers(data.members);
   }
 
   const saveRoom = () => {
-    let roomData = { title, desc, sections: sectionsRef.current };
+    let roomData = { title, desc, sections: sectionsRef.current, "public": isPublic };
     fetch(process.env.REACT_APP_API_URL + (isEditing ? "/api/room/edit" : "/api/room/create"), {
       method: "POST",
       headers: {
@@ -108,10 +119,10 @@ function CreatePage() {
       body: JSON.stringify({ roomData, code })
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-        setMessageOptions({body: json.response});
+        setMessageOptions({body: json.response, submit: () => {window.location = "/home";}});
       }
       else {
-        setErrorOptions({body: json.response});
+        setErrorOptions({body: json.response, submit: () => {window.location = "/home";}});
       }
     });
   }
@@ -125,10 +136,10 @@ function CreatePage() {
       body: JSON.stringify({ code })
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-         setMessageOptions({body: json.response});
+         setMessageOptions({body: json.response, submit: () => {window.location = "/home";}});
       }
       else {
-        setErrorOptions({body: json.response});
+        setErrorOptions({body: json.response, submit: () => {window.location = "/home";}});
       }
     });
   }
@@ -161,8 +172,10 @@ function CreatePage() {
         body: JSON.stringify({ code })
       }).then(resp => resp.json()).then(json => {
         if(json.success) {
-          delete json.response.members;
-          
+          if(json.response.author !== user) {
+            return setErrorOptions({body: "You are not this room's creator!", submit: () => {window.location = "/home";}});
+          }
+
           for(let i = 0; i < json.response.sections.length; i++) {
             delete json.response.sections[i].completed;
             if(json.response.sections[i].checks && json.response.sections[i].checks.length === 0)
@@ -172,6 +185,9 @@ function CreatePage() {
           }
 
           finishImport(JSON.stringify(json.response));
+        }
+        else {
+          setErrorOptions({body: "No room was found with that code.", submit: () => {window.location = "/home";}});
         }
       });
     }
@@ -197,7 +213,7 @@ function CreatePage() {
       <div className="wrapper">
         <CreateSection open={setCreateModal} isOpen={createModal} submit={createSection} />
         <EditSection open={setEditModal} isOpen={editModal} section={sectionRef.current} submit={finishSection} key={sectionRef.current.title} />
-        <ExportModal open={setExportModal} isOpen={exportModal} data={JSON.stringify({title, desc, sections: sectionsRef.current}, null, " ".repeat(4))} />
+        <ExportModal open={setExportModal} isOpen={exportModal} data={JSON.stringify({title, desc, sections: sectionsRef.current, "public": isPublic}, null, " ".repeat(4))} />
         <ImportModal open={setImportModal} isOpen={importModal} submit={finishImport} />
 
         <ProfilePageHeader />
@@ -229,6 +245,18 @@ function CreatePage() {
                     onChange={e => setDesc(e.target.value)}
                   ></Input>
                 </FormGroup>
+                <FormGroup check>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      checked={isPublic}
+                      onChange={e => setPublic(e.target.checked)}
+                    >
+                    </Input>
+                    <span className="form-check-sign"></span>
+                    Public Room
+                  </Label>
+                </FormGroup>
               </Form>
               </Col>
             </Row>
@@ -242,6 +270,28 @@ function CreatePage() {
               </SortableContainer>
               <SectionCard title="Create Section" desc="Create a new section here." button="Create +" onClick={() => setCreateModal(true)}/>
             </Row>
+
+            {(isEditing && members && members.length > 0) && (
+              <>
+                <h4 className="title">Members</h4>
+                <h5>Total enrolled: {members.length} </h5>
+
+                <PaginatedTable
+                  columns={[
+                    {title: "Username", field: "username", formatter: (item) => (
+                      <a href={"/profile/" + item.username} target="_blank">{item.username}</a>
+                    )},
+                    {title: "Completion", field: "completed", formatter: (item) => (
+                      <>{item.completed ? item.completed.length : 0} / {sections.length} sections</>
+                    )}
+                  ]}
+                  items={members}
+                />
+
+                <br />
+              </>
+            )}
+
             <Row className="pull-right">
               <Button color="success" type="button" size="sm" onClick={() => setExportModal(true)}>Export</Button>
               <Button color="primary" type="button" size="sm" onClick={() => setImportModal(true)}>Import</Button>

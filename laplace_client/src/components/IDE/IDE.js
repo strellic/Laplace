@@ -69,7 +69,6 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
 
     ws.onmessage = function (event) {
       let data = JSON.parse(event.data);
-      console.log(data);
 
       if(data.count)
         setCount(data.count);
@@ -111,7 +110,6 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
   }, [ws]);
 
   React.useEffect(() => {
-    console.log(section, collab, status);
     if(!section || !collab || status === "disconnected")
       return;
     ws.send(JSON.stringify({
@@ -232,8 +230,6 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
   }, [navbarRef, codeBottomRef]);
 
   React.useEffect(() => {
-    console.log(active);
-
     if(!useFileStorage && storageKey && active && active.loaded && active.file && active.files) {
       if(JSON.stringify(active.lang.template) !== JSON.stringify(active.files))
         storage.save(storageKey, active);

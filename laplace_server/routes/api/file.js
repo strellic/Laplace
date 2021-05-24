@@ -202,7 +202,7 @@ router.get("/:code", async (req, res) => {
 			return res.json(response.failure("Invalid file."));
 		
 		res.writeHead(200, {
-			'Content-Disposition': `inline; filename="${file.filename.replace(/"/g, "\\\"")}"`,
+			'Content-Disposition': `inline; filename="${encodeURIComponent(file.filename)}"`,
 			'Content-Type': file.mimetype,
 		});
 		return res.end(file.data);

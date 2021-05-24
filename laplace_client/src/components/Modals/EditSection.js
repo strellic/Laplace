@@ -137,8 +137,6 @@ function EditSection({open, isOpen, submit, section}){
   	setFiles(folders);
   }
 
-  console.log(checks);
-
   return (
     <>
       <Modal toggle={() => open(false)} isOpen={isOpen} className="modal-xl">
@@ -238,7 +236,9 @@ function EditSection({open, isOpen, submit, section}){
               <br />
               <Button color="info" type="button" size="sm" onClick={newCase}>+ Test Case</Button>
               <Button color="primary" type="button" size="sm" onClick={newCode}>+ Code Check</Button>
-              <Button color="danger" type="button" size="sm" onClick={delCheck}>-</Button>
+              {checks.length > 0 && (
+                <Button color="danger" type="button" size="sm" onClick={delCheck}>-</Button>
+              )}
             </FormGroup>
           )}
           {type === "flag" && (
@@ -293,6 +293,10 @@ function EditSection({open, isOpen, submit, section}){
 
           {(type === "coding" || type === "jsapp") && (
           	<>
+              {type === "jsapp" && (
+                <div>Upload an HTML file named 'index.html' that runs your JS code.
+                  Run the JS snippet <code>window.parent.postMessage("finish", "*");</code> to finish the section.</div>
+              )}
 	          	{files && files.length !== 0 && (
 	          		<div>
 	          			{files.map((folder, i) => (
@@ -317,6 +321,7 @@ function EditSection({open, isOpen, submit, section}){
           
           {type === "coding" && <Button color="warning" type="button" size="sm" onClick={showLangModal}>Language: {lang.name}</Button>}
         </div>
+
         <div className="modal-footer">
           <Button
             color="danger"

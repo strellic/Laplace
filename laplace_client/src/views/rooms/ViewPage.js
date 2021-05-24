@@ -16,6 +16,7 @@ import {
 
 import { useAuthState } from "context/auth.js";
 import { useAlertState } from "context/alert.js";
+import useWindowSize from "context/windowsize.js";
 
 import fetch from "utils/fetch.js";
 import storage from "utils/storage.js";
@@ -27,8 +28,9 @@ import IDE from "components/IDE/IDE.js";
 
 function ViewPage() {
   const { isSignedIn } = useAuthState();
-  const { setMessageOptions } = useAlertState();
+  const { setMessageOptions, setErrorOptions } = useAlertState();
   const { code } = useParams();
+  const { width, height } = useWindowSize();
 
   const navbarRef = React.createRef();
   const iframeRef = React.createRef();
@@ -40,8 +42,6 @@ function ViewPage() {
 
   const [answer, setAnswer] = React.useState("");
   const [flag, setFlag] = React.useState("");
-
-  const [checks, setChecks] = React.useState(false);
 
   const [confetti, setConfetti] = React.useState(false);
   const [confettiActive, setConfettiActive] = React.useState(true);
@@ -62,6 +62,11 @@ function ViewPage() {
 
         setRoom(room);
 
+        if(!sections || sections.length === 0) {
+          setErrorOptions({ body: "This room has no sections.", submit: () => window.location = "/home" })
+          return;
+        }
+
         let storageKey = `rooms.${room.code}.num`;
         let saved = storage.load(storageKey);
         let nextSection;
@@ -76,20 +81,15 @@ function ViewPage() {
           nextSection = sections[0];
         }
 
-        if(!nextSection) {
-          window.location = "/home";
-          return;
-        }
-
-        let isArray = Array.isArray(section.checks);
-        if(nextSection.type === "coding" && (isArray && nextSection.checks.length > 0) || (!isArray && nextSection.checks)) {
-          setChecks(true);
-        }
-        else {
+        if(nextSection.type === "info") {
           checkCompletion(room, nextSection);
         }
 
         setLoaded(true);
+        if(!nextSection) {
+          window.location = "/home";
+          return;
+        }
       }
       else {
         window.location = "/home";
@@ -108,7 +108,6 @@ function ViewPage() {
         iframeRef.current.src = process.env.REACT_APP_API_URL + "/api/file/" + file.code;
       }
       window.onmessage = (e) => {
-        console.log(e);
         if(e.origin === process.env.REACT_APP_API_URL) {
           if(e.data === "finish") {
             checkCompletion(room, section, true);
@@ -119,8 +118,13 @@ function ViewPage() {
   }, [iframeRef]);
 
   const checkCompletion = (room, section, force = false) => {
+    // if author viewing, checks will be the array of test cases
+    // if student viewing, checks will be a boolean
+    let hasChecks = (Array.isArray(section.checks) && section.checks.length > 0)
+                    || (!Array.isArray(section.checks) && section.checks);  
+
     if(!section.completed || force) {
-      if(section.type === "info" || (section.type === "jsapp" && force) || (section.type === "coding" && !checks) || (section.type === "quiz" && answer) || (section.type === "flag" && flag)) {
+      if(section.type === "info" || (section.type === "jsapp" && force) || (section.type === "coding" && !hasChecks) || (section.type === "quiz" && answer) || (section.type === "flag" && flag)) {
         fetch(process.env.REACT_APP_API_URL + "/api/room/complete", {
           method: "POST",
           headers: {
@@ -129,7 +133,7 @@ function ViewPage() {
           body: JSON.stringify({ room: room.code, section: section.code, answer, flag })
         }).then(resp => resp.json()).then(json => {
           if(json.success) {
-            complete(room, section, section.type === "info" || (section.type === "coding" && !checks));
+            complete(room, section, section.type === "info" || (section.type === "coding" && !hasChecks));
           }
           else {
             setMessageOptions({title: "Info", body: json.response});
@@ -191,7 +195,7 @@ function ViewPage() {
 
   return (
     <div className="room-wrapper">
-      <Confetti run={confetti} recycle={confettiActive} onConfettiComplete={() => {setConfetti(false); setConfettiActive(true)}} />
+      <Confetti width={width} height={height} run={confetti} recycle={confettiActive} onConfettiComplete={() => {setConfetti(false); setConfettiActive(true)}} />
       <Navbar transparent={false} fixed={false} className="mb-0" innerRef={navbarRef} />
           <Row className="p-0 h-100">
             {section.type === "info" && (

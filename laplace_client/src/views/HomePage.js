@@ -103,7 +103,10 @@ function HomePage() {
           <Container>
             <h3 className="title">Created Rooms</h3>
             <Row>
-              {created && created.map((room, i) => <RoomCard key={i} completed={getCompleted(room)} {...room} buttons={[{href: "/rooms/view/" + room.code, text: "Open"}, {href: "/rooms/edit/" + room.code, text: "Edit", color: "danger"}]} />)}
+              {created && created.map((room, i) => <RoomCard key={i} completed={getCompleted(room)} {...room} buttons={[
+                {href: "/rooms/view/" + room.code, text: "Open"},
+                {href: "/rooms/edit/" + room.code, text: "Manage", color: "danger"}
+              ]} />)}
               <RoomCard title="Create Room" desc="Create your own room with custom challenges and content here!" buttons={[{href: "/rooms/create", text: "Create +"}]} />
             </Row>
           </Container>

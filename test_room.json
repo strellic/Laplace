@@ -9,7 +9,7 @@
         },
         {
             "title": "Hello, world!",
-            "markdown": "#### **Learning Objectives:**\n##### Learn how to print to the screen!\n##### **Description:**\n##### Hello, world!\n##### Let's start off with a simple Hello, world! program.\n#### **Input Format:**\n#####  Your program's output should not change whether it receives any input or not.\n#### **Output Format:**\n###### `\"Hello, world!\"`",
+            "markdown": "#### **Learning Objectives:**\n##### Learn how to print to the screen!\n##### **Description:**\n##### Hello, world!\n##### Let's start off with a simple Hello, world! program.\n#### **Input Format:**\n#####  Your program's output should not change whether it receives any input or not.\n#### **Output Format:**\n`\"Hello, world!\"`",
             "type": "coding",
             "checks": [
                 {
@@ -68,5 +68,6 @@
                 }
             ]
         }
-    ]
+    ],
+    "public": true
 }

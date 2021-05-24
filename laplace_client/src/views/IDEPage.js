@@ -8,8 +8,7 @@ import {
   Button,
   Form,
   FormGroup,
-  Label,
-  Input
+  Label
 } from "reactstrap";
 
 import { useLocation } from "react-router-dom";
@@ -65,6 +64,7 @@ function IDEPage() {
         if(folders[i].folder !== "/" && folders[i].folder.endsWith("/"))
           folders[i].folder = folders[i].folder.slice(0, -1);
       }
+
       fetch(process.env.REACT_APP_API_URL + "/api/file/update", {
         method: "POST",
         body: JSON.stringify({ data: folders })
@@ -78,6 +78,9 @@ function IDEPage() {
           setErrorOptions({body: json.response});
         }
       })
+      .catch(err => {
+        setErrorOptions({body: "There was an error saving your files."});
+      });
     }
   }
 

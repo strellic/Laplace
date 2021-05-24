@@ -24,6 +24,7 @@ const ROOM_SCHEMA = {
 	"properties": {
 		"title": { "type": "string", "minLength": 3, "maxLength": 30 },
 		"desc": { "type": "string", "minLength": 3, "maxLength": 280 },
+        "public": { "type": "boolean" },
 		"sections": {
 			"type": "array",
      		"items": {
@@ -121,6 +122,7 @@ router.post("/create", authenticate.requiresLogin, async (req, res) => {
 			desc: roomData.desc,
 			code: uuidv4(),
 			author: user,
+            public: roomData.public
 		});
 
 		let sections = [];
@@ -191,6 +193,7 @@ router.post("/edit", authenticate.requiresLogin, async (req, res) => {
 		}
 
 		room.sections = sections;
+        room.public = roomData.public;
 		await room.save();
 
 		if(remove.ids.length > 0) {
@@ -247,15 +250,17 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
 
 	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
 
-	Room.findOne({ code }).populate("sections").populate("members").populate("author").exec((err, room) => {
-		if(err) {
+	Room.findOne({ code })
+    .populate("sections")
+    .populate({path: "members", populate: {path: "completed", populate: {path: "room sections" }}})
+    .populate("author").exec((err, room) => {
+		if(err || !room) {
 			return res.json(response.failure("Unable to find room."));
 		}
 
 		let clone = response.sanitize(room);
 
 		clone.author = clone.author.username;
-		clone.members = clone.members.map(member => member.username);
 
 		let completed = user.completed.find(c => c.room.code === room.code);
 
@@ -275,7 +280,15 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
 					clone.sections[i].answers = clone.sections[i].answers.map(answer => ({choice: answer.choice}));
 				}
 			}
+            delete clone.members;
 		}
+        else {
+            clone.members = clone.members.map(m => ({
+                username: m.username,
+                completed: m.completed.filter(c => c.room.code === code)[0]?.sections.map(s => s.code)
+            }));
+        }
+
 		clone.sections = response.sanitize(clone.sections, ["room"]);
 
 		return res.json(response.success(clone));
@@ -312,10 +325,22 @@ router.post("/join", authenticate.requiresLogin, async (req, res) => {
 		}
 
 		user.enrolled.push(room);
+        room.members.push(user);
+        room.save();
 		user.save();
 
 		return res.json(response.success("You have successfully joined the room."));
 	});
+});
+
+router.get("/list", async (req, res) => {
+    Room.find({ public: true }).populate("author").exec((err, docs) => {
+        if(err) {
+            return res.json(response.failure("Unable to list public rooms."));
+        }
+        let rooms = docs.map(r => ({ code: r.code, title: r.title, desc: r.desc, author: r.author.username }));
+        return res.json(response.success(rooms));
+    });
 });
 
 export default router;

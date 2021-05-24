@@ -20,7 +20,7 @@ function sanitize(obj, keys = [], n = 0) {
 
 	obj = JSON.parse(JSON.stringify(obj));
 
-	keys = [...keys, "__v", "_id"];
+	keys = [...keys, "__v", "_id", "password"];
 
 	for(let key in obj) {
 		if(keys.includes(key)) {

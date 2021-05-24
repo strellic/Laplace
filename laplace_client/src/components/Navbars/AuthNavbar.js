@@ -87,6 +87,12 @@ function AuthNavbar({ transparent = true, fixed = true, innerRef, className }) {
                 </NavLink>
               </NavItem>
               <NavItem>
+                <NavLink href="/rooms/list">
+                  <i className="fas fa-list mr-1"></i>
+                  Rooms
+                </NavLink>
+              </NavItem>
+              <NavItem>
                 <NavLink href="/ide">
                   <i className="fas fa-code mr-1"></i>
                   IDE

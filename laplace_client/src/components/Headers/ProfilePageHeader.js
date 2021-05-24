@@ -56,11 +56,11 @@ function ProfilePageHeader() {
         <Container>
           <h3 className="title">Welcome, {user}!</h3>
           <div className="content">
-            <div className="social-description">
+            <div className="d-inline-block mr-2">
               <h2>{done}</h2>
               <p>Rooms Done</p>
             </div>
-            <div className="social-description">
+            <div className="d-inline-block ml-2">
               <h2>{joined}</h2>
               <p>Rooms Joined</p>
             </div>

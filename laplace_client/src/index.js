@@ -18,10 +18,12 @@ import LoginPage from "views/LoginPage.js";
 import RegisterPage from "views/RegisterPage.js";
 import LogoutPage from "views/LogoutPage.js";
 import HomePage from "views/HomePage.js";
+import ProfilePage from "views/ProfilePage.js";
 import IDEPage from "views/IDEPage.js";
 
 import CreatePage from "views/rooms/CreatePage.js";
 import ViewPage from "views/rooms/ViewPage.js";
+import ListPage from "views/rooms/ListPage.js";
 
 ReactDOM.render(
   <AuthProvider>
@@ -43,6 +45,7 @@ ReactDOM.render(
                 render={(props) => <LogoutPage {...props} />}
               />
               <Route path="/home" render={(props) => <HomePage {...props} />} />
+              <Route path="/profile/:target?" render={(props) => <ProfilePage {...props} />} />
               <Route path="/ide" render={(props) => <IDEPage {...props} />} />
               <Route
                 path="/rooms/create"
@@ -55,6 +58,10 @@ ReactDOM.render(
               <Route
                 path="/rooms/view/:code"
                 render={(props) => <ViewPage {...props} />}
+              />
+              <Route
+                path="/rooms/list"
+                render={(props) => <ListPage {...props} />}
               />
               <Route path="/" render={(props) => <Index {...props} />} />
             </Switch>
