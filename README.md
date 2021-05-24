@@ -1,4 +1,5 @@
 # Laplace
+![](https://i.imgur.com/AFR5lR8.png)
 
 Laplace is a web-based learning and coding platform for both students and teachers alike!
 
