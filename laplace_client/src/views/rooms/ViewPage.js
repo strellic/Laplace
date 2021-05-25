@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import Confetti from 'react-confetti';
 // reactstrap components
 import {
@@ -28,6 +28,7 @@ function ViewPage() {
   const { isSignedIn } = useAuthState();
   const { setMessageOptions, setErrorOptions } = useAlertState();
   const { code } = useParams();
+  const history = useHistory();
   const { width, height } = useWindowSize();
 
   const navbarRef = React.createRef();
@@ -89,7 +90,7 @@ function ViewPage() {
         setRoom(room);
 
         if(!sections || sections.length === 0) {
-          setErrorOptions({ body: "This room has no sections.", submit: () => window.location = "/home" })
+          setErrorOptions({ body: "This room has no sections.", submit: () => history.push("/home") })
           return;
         }
 
@@ -113,15 +114,15 @@ function ViewPage() {
 
         setLoaded(true);
         if(!nextSection) {
-          window.location = "/home";
-          return;
+          history.push("/home");
+          return <></>;
         }
       }
       else {
-        window.location = "/home";
+        history.push("/home");
       }
     });
-  }, [code, checkCompletion, setErrorOptions]);
+  }, [code, history, checkCompletion, setErrorOptions]);
 
   React.useEffect(() => {
     if(section.type === "jsapp" && !iframeRef.current.src) {
@@ -164,8 +165,8 @@ function ViewPage() {
   }, [num, checkCompletion, loaded, room, storageKey]);
 
   if(!isSignedIn) {
-    window.location = "/";
-    return;
+    history.push("/");
+    return <></>;
   }
 
   if(!section) {
@@ -188,7 +189,7 @@ function ViewPage() {
         <Button color="info" type="button" onClick={() => setNum(num+1)}>Next <i className="fas fa-arrow-right"></i></Button>
       )}
       {(loaded && section.completed && num === room.sections.length - 1) && (
-        <Button color="success" type="button" onClick={() => setMessageOptions({title: "Congratulations!", body: "You have completed the room!", submit: () => window.location = "/home"})}>Finish <i className="fas fa-flag"></i></Button>
+        <Button color="success" type="button" onClick={() => setMessageOptions({title: "Congratulations!", body: "You have completed the room!", submit: () => history.push("/home")})}>Finish <i className="fas fa-flag"></i></Button>
       )}
     </div>
   );

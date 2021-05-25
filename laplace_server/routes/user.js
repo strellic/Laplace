@@ -130,6 +130,12 @@ router.post("/update_pic", authenticate.requiresLogin, async (req, res) => {
     let code = req.body.code;
     let user = req.user;
 
+    if(!code) {
+        user.profilepic = null;
+        user.save();
+        return res.json(response.success("Profile picture removed."));
+    }
+
     File.count({code}, (err, count) => {
         if(err || count === 0) {
             return res.json(response.success("That file was not found."));

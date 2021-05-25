@@ -7,6 +7,9 @@ import {
   Input,
   FormGroup
 } from "reactstrap";
+
+import { Link, useHistory } from "react-router-dom";
+
 import { useAuthState } from "context/auth.js";
 import { useAlertState } from "context/alert.js";
 
@@ -20,6 +23,7 @@ import DefaultFooter from "components/Footers/DefaultFooter.js";
 import PaginatedTable from "components/Form/PaginatedTable.js";
 
 function ListPage() {
+  const history = useHistory();
   const { isSignedIn } = useAuthState();
   const { setMessageOptions, setErrorOptions } = useAlertState();
 
@@ -56,7 +60,7 @@ function ListPage() {
   }, [rooms, search])
 
   if(!isSignedIn) {
-    window.location = "/";
+    history.push("/");
     return;
   }
 
@@ -69,7 +73,7 @@ function ListPage() {
       body: JSON.stringify({ code })
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-        setMessageOptions({body: json.response, submit: () => {window.location = "/home"}});
+        setMessageOptions({body: json.response, submit: () => {history.push("/home")}});
       }
       else {
         setErrorOptions({body: json.response});
@@ -80,7 +84,7 @@ function ListPage() {
   const columns = [
     {title: "Title", field: "title"},
     {title: "Author", field: "author", formatter: (item) => (
-      <a href={"/profile/" + item.author} target="_blank" rel="noopener noreferrer">{item.author}</a>
+      <Link to={"/profile/" + item.author}>{item.author}</Link>
     )},
     {title: "Code", field: "code"},
     {title: "Description", field: "desc"},

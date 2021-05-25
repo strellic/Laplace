@@ -17,6 +17,8 @@ const ajv = new Ajv.default({
   allErrors: true,
 });
 
+const SECTION_TYPES = ["info", "coding", "quiz", "flag", "jsapp"];
+
 const FILE_SCHEMA = {
     "type": "array",
     "items": {
@@ -59,7 +61,7 @@ const ROOM_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "title": { "type": "string", "minLength": 3, "maxLength": 30 },
-                    "type": { "enum": ["info", "coding", "quiz", "flag", "jsapp"] },
+                    "type": { "enum": SECTION_TYPES },
                     "code": { "type": "string" },
                     "markdown": { "type": "string" },
                     "lang": { "type": "string" },
@@ -335,6 +337,10 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
         }
 
 		clone.sections = response.sanitize(clone.sections, ["room"]);
+        for(let i = 0; i < clone.sections.length; i++) {
+            for(let type of SECTION_TYPES.filter(t => t !== clone.sections[i].type))
+                delete clone.sections[i][type]; 
+        }
 
 		return res.json(response.success(clone));
 	});

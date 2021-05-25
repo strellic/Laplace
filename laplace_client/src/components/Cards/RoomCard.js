@@ -9,6 +9,8 @@ import {
   Progress 
 } from "reactstrap";
 
+import { Link } from "react-router-dom";
+
 function RoomCard({ title, desc, completed, buttons = [] }) {
   let progress;
   if(completed) {
@@ -23,16 +25,27 @@ function RoomCard({ title, desc, completed, buttons = [] }) {
         <CardText>
           {desc}
         </CardText>
-        {buttons && buttons.map((button, i) => (
-          <Button
-            key={i}
-            color={button.color || "info"}
-            onClick={e => {button.onClick && button.onClick(title)} }
-            href={button.href}
-          >
-            {button.text}
-          </Button>
-        ))}
+        {buttons && buttons.map((button, i) => {
+          return button.to ? (
+             <Button
+              key={i}
+              color={button.color || "info"}
+              onClick={e => {button.onClick && button.onClick(title)} }
+              tag={Link}
+              to={button.to}
+            >
+              {button.text}
+            </Button>
+          ) : (
+            <Button
+              key={i}
+              color={button.color || "info"}
+              onClick={e => {button.onClick && button.onClick(title)} }
+            >
+              {button.text}
+            </Button>
+          )
+        })}
         {completed && (
           <div className="progress-container progress-success mb-2">
             <Progress max="100" value={progress}>

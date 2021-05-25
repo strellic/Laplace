@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Container, Row, Col, Button } from "reactstrap";
+import { Link } from "react-router-dom"; 
 
 // core components
 import Navbar from "components/Navbars/Navbar.js";
@@ -76,18 +77,20 @@ function Index() {
               <Button
                   className="btn-round mr-1"
                   color="info"
-                  href="/register"
+                  to="/register"
                   role="button"
                   size="lg"
+                  tag={Link}
               >
                 Register
               </Button>
               <Button
                   className="btn-round"
                   color="primary"
-                  href="/login"
+                  to="/login"
                   role="button"
                   size="lg"
+                  tag={Link}
               >
                 Login
               </Button>

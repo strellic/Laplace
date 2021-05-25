@@ -5,6 +5,7 @@ import {
   Container,
   Row
 } from "reactstrap";
+import { useHistory } from "react-router-dom";
 import { useAuthState } from "context/auth.js";
 
 import fetch from "utils/fetch.js";
@@ -20,6 +21,7 @@ import MessageModal from "components/Modals/MessageModal.js";
 
 function HomePage() {
   const { isSignedIn } = useAuthState(true);
+  const history = useHistory();
 
   const [joinModal, setJoinModal] = React.useState(false);
   const [messageModal, setMessageModal] = React.useState(false);
@@ -81,8 +83,8 @@ function HomePage() {
   }, []);
 
   if(!isSignedIn) {
-    window.location = "/";
-    return;
+    history.push("/");
+    return <></>;
   }
 
   return (
@@ -96,7 +98,7 @@ function HomePage() {
           <Container>
             <h3 className="title">Enrolled Rooms</h3>
             <Row>
-              {enrolled && enrolled.map((room, i) => <RoomCard key={i} completed={getCompleted(room)} {...room} buttons={[{href: "/rooms/view/" + room.code, text: "Open"}]} />)}
+              {enrolled && enrolled.map((room, i) => <RoomCard key={i} completed={getCompleted(room)} {...room} buttons={[{to: "/rooms/view/" + room.code, text: "Open"}]} />)}
               <RoomCard title="Join Room" desc="Join a new room here by entering its room code." buttons={[{onClick: () => {setJoinModal(true)}, text: "Join +"}]} />
             </Row>
           </Container>
@@ -104,10 +106,10 @@ function HomePage() {
             <h3 className="title">Created Rooms</h3>
             <Row>
               {created && created.map((room, i) => <RoomCard key={i} completed={getCompleted(room)} {...room} buttons={[
-                {href: "/rooms/view/" + room.code, text: "Open"},
-                {href: "/rooms/edit/" + room.code, text: "Manage", color: "danger"}
+                {to: "/rooms/view/" + room.code, text: "Open"},
+                {to: "/rooms/edit/" + room.code, text: "Manage", color: "danger"}
               ]} />)}
-              <RoomCard title="Create Room" desc="Create your own room with custom challenges and content here!" buttons={[{href: "/rooms/create", text: "Create +"}]} />
+              <RoomCard title="Create Room" desc="Create your own room with custom challenges and content here!" buttons={[{to: "/rooms/create", text: "Create +"}]} />
             </Row>
           </Container>
         </div>

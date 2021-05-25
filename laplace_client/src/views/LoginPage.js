@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useHistory } from "react-router-dom";
 // reactstrap components
 import {
   Container,
@@ -16,6 +16,7 @@ import { useAuthState } from "context/auth.js";
 
 function LoginPage() {
   const { isSignedIn } = useAuthState();
+  const history = useHistory();
 
   React.useEffect(() => {
     document.body.classList.add("login-page");
@@ -31,8 +32,8 @@ function LoginPage() {
   }, []);
 
   if(isSignedIn) {
-    window.location = "/home";
-    return;
+    history.push("/home");
+    return <></>;
   }
 
   return (

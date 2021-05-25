@@ -3,6 +3,7 @@ import React from "react";
 
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
+import { Link } from "react-router-dom";
 
 function DarkFooter() {
   return (
@@ -10,16 +11,11 @@ function DarkFooter() {
       <Container className="text-white">
         <Row>
           <Col>
-              <a href="https://github.com/strellic/Laplace" target="_blank"><i className="fab fa-github text-white"></i></a>
+              <Link to="https://github.com/strellic/Laplace"><i className="fab fa-github text-white"></i></Link>
           </Col>
           <Col className="copyright text-right" id="copyright">
             © {new Date().getFullYear()}, designed by{" "}
-            <a
-              href="https://brycec.me"
-              target="_blank"
-            >
-              Bryce
-            </a>
+            <Link to="https://brycec.me">Bryce</Link>
             {" "}with ❤️. 
           </Col>
         </Row>

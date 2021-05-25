@@ -8,9 +8,11 @@ import {
   CardText
 } from "reactstrap";
 
+import { Link } from "react-router-dom";
+
 class SectionCard extends React.Component {
   render() {
-    const { title, desc, onClick = () => {}, onDelete = null, href, button = "Edit" } = this.props;
+    const { title, desc, onClick = () => {}, onDelete = null, to, button = "Edit" } = this.props;
     return (
       <Card className="room-card mr-3">
         <CardBody>
@@ -18,13 +20,25 @@ class SectionCard extends React.Component {
           <CardText>
             {desc}
           </CardText>
-          <Button
-            color="info"
-            onClick={e => {onClick(title)} }
-            href={href}
-          >
-            {button}
-          </Button>
+          
+          { to ? (
+            <Button
+              color="info"
+              onClick={e => {onClick(title)} }
+              tag={Link}
+              to={to}
+            >
+              {button}
+            </Button>
+          ) : (
+            <Button
+              color="info"
+              onClick={e => {onClick(title)} }
+            >
+              {button}
+            </Button>
+          )}
+          
           {onDelete && (<Button
             color="danger"
             onClick={e => {onDelete(title)} }

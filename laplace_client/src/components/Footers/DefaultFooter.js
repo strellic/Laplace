@@ -6,6 +6,8 @@ import { Container, Row, Col } from "reactstrap";
 
 // core components
 
+import { Link } from "react-router-dom";
+
 function DefaultFooter() {
   return (
     <>
@@ -13,17 +15,12 @@ function DefaultFooter() {
         <Container>
           <Row>
             <Col>
-                <a href="https://github.com/strellic/Laplace" target="_blank"><i className="fab fa-github text-black"></i></a>
+                <Link to="https://github.com/strellic/Laplace"><i className="fab fa-github text-black"></i></Link>
             </Col>
             <Col className="copyright text-right" id="copyright">
               © {new Date().getFullYear()}, designed by{" "}
-              <a
-                href="https://brycec.me"
-                target="_blank"
-              >
-                Bryce
-              </a>
-              {" "}with ❤️. 
+              <Link to="https://brycec.me">Bryce</Link>
+              {" "}with ❤. 
             </Col>
           </Row>
         </Container>

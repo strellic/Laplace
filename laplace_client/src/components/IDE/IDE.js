@@ -1,5 +1,6 @@
 import React from "react";
 import {Controlled as CodeMirror} from 'react-codemirror2';
+import { useHistory } from "react-router-dom";
 
 import {
   Col,
@@ -26,6 +27,7 @@ import storage from "utils/storage.js";
 import fetch from "utils/fetch.js";
 
 function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room, section, files, lang, collabCode, base, size="normal", onSave = () => {}, onComplete = () => {}}) {
+  const history = useHistory();
   const { isSignedIn, token } = useAuthState();
   const { setInputOptions, setConfirmOptions, setSelectOptions, setErrorOptions } = useAlertState();
 
@@ -100,7 +102,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
       else if(data.type === "collab") {
         setCollab(true);
         if(data.meta === "error") {
-          setErrorOptions({body: data.msg, submit: () => window.location = "/home"});
+          setErrorOptions({body: data.msg, submit: () => history.push("/home")});
         }
         else if(data.meta === "create") {
           setInputOptions({value: window.location.origin + "/ide?collab=" + data.msg, title: "Collab URL", body: "Send this URL to someone you want to share your code with."});
@@ -115,7 +117,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         }
       }
     }
-  }, [ws, onComplete, setErrorOptions, setInputOptions]);
+  }, [ws, history, onComplete, setErrorOptions, setInputOptions]);
 
   React.useEffect(() => {
     if(!section || !collab || status === "disconnected")
@@ -210,10 +212,10 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
         }
       }
       else {
-        window.location = "/home";
+        history.push("/home");
       }
     });
-  }, [files, collabCode, lang, storageKey, useFileStorage]);
+  }, [files, history, collabCode, lang, storageKey, useFileStorage]);
 
   React.useEffect(() => {
     function handleResize() {

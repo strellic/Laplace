@@ -5,10 +5,12 @@ import {
   NavbarBrand,
   Navbar,
   NavItem,
-  NavLink,
   Nav,
+  NavLink,
   Container
 } from "reactstrap";
+
+import { NavLink as RRNavLink } from 'react-router-dom';
 
 function AuthNavbar({ transparent = true, fixed = true, innerRef, className }) {
   const [navbarColor, setNavbarColor] = React.useState(transparent ? "navbar-transparent": "");
@@ -48,10 +50,7 @@ function AuthNavbar({ transparent = true, fixed = true, innerRef, className }) {
       <Navbar className={(fixed ? "fixed-top " : "") + navbarColor + " " + className} color="info" expand="lg">
         <Container>
           <div ref={innerRef} className="navbar-translate">
-            <NavbarBrand
-              href="/"
-              id="navbar-brand"
-            >
+            <NavbarBrand tag={RRNavLink} to="/" id="navbar-brand">
               Laplace
             </NavbarBrand>
             <button
@@ -75,31 +74,31 @@ function AuthNavbar({ transparent = true, fixed = true, innerRef, className }) {
           >
             <Nav navbar>
               <NavItem>
-                <NavLink href="/home">
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/home">
                   <i className="fas fa-home mr-1"></i>
                   Home
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/profile">
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/profile">
                   <i className="fas fa-user mr-1"></i>
                   Profile
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/rooms/list">
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/rooms/list">
                   <i className="fas fa-list mr-1"></i>
                   Rooms
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/ide">
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/ide">
                   <i className="fas fa-code mr-1"></i>
                   IDE
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/logout">
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/logout">
                   <i className="fas fa-sign-out-alt mr-1"></i>
                   Logout
                 </NavLink>

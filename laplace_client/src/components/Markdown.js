@@ -13,7 +13,7 @@ function Markdown(props) {
 	    return '';
 	  }
 	});
-	const html = mdParser.render(props.markdown);
+	const html = mdParser.render(props.markdown || "");
 
 	let settings = {...props};
 	settings.markdown = null;

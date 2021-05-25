@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useHistory } from "react-router-dom";
 // reactstrap components
 import {
   Button,
@@ -33,6 +33,7 @@ import ExportModal from "components/Modals/ExportModal.js";
 import ImportModal from "components/Modals/ImportModal.js";
 
 function CreatePage() {
+  const history = useHistory();
   const { user, isSignedIn } = useAuthState();
   const { setErrorOptions, setMessageOptions } = useAlertState();
 
@@ -116,7 +117,7 @@ function CreatePage() {
       body: JSON.stringify({ roomData, code })
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-        setMessageOptions({body: json.response, submit: () => {window.location = "/home";}});
+        setMessageOptions({body: json.response, submit: () => {history.push("/home")}});
       }
       else {
         setErrorOptions({body: json.response});
@@ -133,10 +134,10 @@ function CreatePage() {
       body: JSON.stringify({ code })
     }).then(resp => resp.json()).then(json => {
       if(json.success) {
-         setMessageOptions({body: json.response, submit: () => {window.location = "/home";}});
+         setMessageOptions({body: json.response, submit: () => {history.push("/home")}});
       }
       else {
-        setErrorOptions({body: json.response, submit: () => {window.location = "/home";}});
+        setErrorOptions({body: json.response, submit: () => {history.push("/home")}});
       }
     });
   }
@@ -170,7 +171,7 @@ function CreatePage() {
       }).then(resp => resp.json()).then(json => {
         if(json.success) {
           if(json.response.author !== user) {
-            return setErrorOptions({body: "You are not this room's creator!", submit: () => {window.location = "/home";}});
+            return setErrorOptions({body: "You are not this room's creator!", submit: () => {history.push("/home")}});
           }
 
           for(let i = 0; i < json.response.sections.length; i++) {
@@ -184,7 +185,7 @@ function CreatePage() {
           finishImport(JSON.stringify(json.response));
         }
         else {
-          setErrorOptions({body: "No room was found with that code.", submit: () => {window.location = "/home";}});
+          setErrorOptions({body: "No room was found with that code.", submit: () => {history.push("/home")}});
         }
       });
     }
@@ -193,15 +194,15 @@ function CreatePage() {
       document.body.classList.remove("profile-page");
       document.body.classList.remove("sidebar-collapse");
     };
-  }, [code, isEditing, user, setErrorOptions]);
+  }, [code, history, isEditing, user, setErrorOptions]);
 
   React.useEffect(() => {
     sectionsRef.current = sections;
   }, [sections]);
 
   if(!isSignedIn) {
-    window.location = "/";
-    return;
+    history.push("/");
+    return <></>;
   }
 
   return (
@@ -276,7 +277,7 @@ function CreatePage() {
                 <PaginatedTable
                   columns={[
                     {title: "Username", field: "username", formatter: (item) => (
-                      <a href={"/profile/" + item.username} target="_blank" rel="noopener noreferrer">{item.username}</a>
+                      <Link to={"/profile/" + item.username}>{item.username}</Link>
                     )},
                     {title: "Completion", field: "completed", formatter: (item) => (
                       <>{item.completed ? item.completed.length : 0} / {sections.length} sections</>

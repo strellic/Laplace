@@ -28,7 +28,6 @@ ReactDOM.render(
   <AuthProvider>
     <BrowserRouter>
       <AlertProvider>
-        <Switch>
           <Switch>
             <Route
               path="/login"
@@ -63,7 +62,6 @@ ReactDOM.render(
             />
             <Route path="/" render={(props) => <Index {...props} />} />
           </Switch>
-        </Switch>
       </AlertProvider>
     </BrowserRouter>
   </AuthProvider>,

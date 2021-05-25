@@ -10,6 +10,8 @@ import {
   Container,
 } from "reactstrap";
 
+import { NavLink as RRNavLink } from 'react-router-dom';
+
 function IndexNavbar({ transparent = true, fixed = true, innerRef, className }) {
   const [navbarColor, setNavbarColor] = React.useState(transparent ? "navbar-transparent": "");
   const [collapseOpen, setCollapseOpen] = React.useState(false);
@@ -48,10 +50,7 @@ function IndexNavbar({ transparent = true, fixed = true, innerRef, className }) 
       <Navbar className={(fixed ? "fixed-top " : "") + navbarColor + " " + className} expand="lg" color="info">
         <Container>
           <div ref={innerRef} className="navbar-translate">
-            <NavbarBrand
-              href="/"
-              id="navbar-brand"
-            >
+            <NavbarBrand tag={RRNavLink} to="/" id="navbar-brand">
               Laplace
             </NavbarBrand>
             <button
@@ -75,17 +74,13 @@ function IndexNavbar({ transparent = true, fixed = true, innerRef, className }) 
           >
             <Nav navbar>
               <NavItem>
-                <NavLink
-                  href="/register"
-                >
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/register">
                   <i className="fas fa-user mr-1"></i>
                   <span>Register</span>
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink
-                  href="/login"
-                >
+                <NavLink tag={RRNavLink} exact activeClassName="active" to="/login">
                   <i className="fas fa-sign-in-alt  mr-1"></i>
                   <span>Login</span>
                 </NavLink>

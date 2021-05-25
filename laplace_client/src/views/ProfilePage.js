@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import Cookies from 'universal-cookie';
 
 // reactstrap components
@@ -31,6 +31,7 @@ function ProfilePage() {
   const { setMessageOptions, setErrorOptions, setFileListOptions } = useAlertState();
   const { isSignedIn, user, email } = useAuthState();
   const cookies = new Cookies();
+  const history = useHistory();
   let { target } = useParams();
 
   if(!target) {
@@ -39,6 +40,17 @@ function ProfilePage() {
 
   const [userData, setUserData] = React.useState({});
   const [loaded, setLoaded] = React.useState(false);
+
+  const response = (json) => {
+    if(!json.success) {
+      return setErrorOptions({body: json.response, submit: () => {
+        history.push("/profile");
+      }});
+    }
+    setMessageOptions({ body: json.response, submit: () => {
+      history.push("/profile");
+    }});
+  };
 
   React.useEffect(() => {
     fetch(process.env.REACT_APP_API_URL + "/user/info?username=" + encodeURIComponent(target), {
@@ -50,11 +62,11 @@ function ProfilePage() {
       }
       else {
         setErrorOptions({body: json.response, submit: () => {
-          window.location = "/home";
+          history.push("/home");
         }});
       }
     });
-  }, [target, setErrorOptions]);
+  }, [target, history, setErrorOptions]);
 
   const [ info, setInfo ] = React.useState({});
   const [ pass, setPass ] = React.useState({});
@@ -78,15 +90,13 @@ function ProfilePage() {
     .then(json => {
       if(!json.success) {
         return setErrorOptions({body: json.response, submit: () => {
-          window.location = "/profile";
+          history.push("/profile");
         }});
       }
-      else {
-        setMessageOptions({ body: "Update successful!", submit: () => {
-          window.location = "/profile";
-        }});
-        cookies.set("authToken", json.response);
-      }
+      setMessageOptions({ body: "Update successful!", submit: () => {
+        history.push("/profile");
+      }});
+      cookies.set("authToken", json.response);
     });
   };
 
@@ -100,18 +110,7 @@ function ProfilePage() {
       body: JSON.stringify({ ...pass })
     })
     .then(resp => resp.json())
-    .then(json => {
-      if(!json.success) {
-        return setErrorOptions({body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-      else {
-        setMessageOptions({ body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-    });
+    .then(response);
   }
 
   const changeBio = (e) => {
@@ -124,18 +123,7 @@ function ProfilePage() {
       body: JSON.stringify({ bio })
     })
     .then(resp => resp.json())
-    .then(json => {
-      if(!json.success) {
-        return setErrorOptions({body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-      else {
-        setMessageOptions({ body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-    });
+    .then(response);
   }
 
   const changePic = (file) => {
@@ -147,18 +135,15 @@ function ProfilePage() {
       body: JSON.stringify({ code: file.code })
     })
     .then(resp => resp.json())
-    .then(json => {
-      if(!json.success) {
-        return setErrorOptions({body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-      else {
-        setMessageOptions({ body: json.response, submit: () => {
-          window.location = "/profile";
-        }});
-      }
-    });
+    .then(response);
+  };
+
+  const deletePic = () => {
+    fetch(process.env.REACT_APP_API_URL + '/user/update_pic', {
+      method: 'POST'
+    })
+    .then(resp => resp.json())
+    .then(response);
   };
 
   React.useEffect(() => {
@@ -175,8 +160,8 @@ function ProfilePage() {
   }, []);
 
   if(!isSignedIn) {
-    window.location = "/";
-    return;
+    history.push("/");
+    return <></>;
   }
 
   return (
@@ -194,10 +179,17 @@ function ProfilePage() {
                       className="rounded-circle"
                       src={userData.profilepic ?
                         process.env.REACT_APP_API_URL + '/file/' + userData.profilepic
-                        : "https://ui-avatars.com/?name=" + userData.username
+                        : "https://ui-avatars.com/api/?name=" + userData.username
                       }
                       style={{"width": "8rem"}}
-                      onError={() => this.src = "https://ui-avatars.com/?name=" + userData.username}
+                      onError={(e) => {
+                        if(target === user) {
+                          fetch(process.env.REACT_APP_API_URL + '/user/update_pic', {
+                            method: 'POST'
+                          });
+                        }
+                        e.target.src = "https://ui-avatars.com/api/?name=" + userData.username
+                      }}
                       alt={userData.username + "'s profile picture"}
                     ></img>
                     <CardTitle tag="h4">{userData.name ? `${userData.name} (${userData.username})` : userData.username}'s Profile</CardTitle>
@@ -268,6 +260,14 @@ function ProfilePage() {
                         onClick={() => setFileListOptions({title: "Select new profile picture:", submit: changePic})}
                       >
                         Change Profile Picture
+                      </Button>
+                      <Button
+                        color="danger"
+                        type="button"
+                        size="sm"
+                        onClick={deletePic}
+                      >
+                        Delete Profile Picture
                       </Button>
                       <Button
                         color="info"

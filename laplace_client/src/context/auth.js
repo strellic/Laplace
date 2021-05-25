@@ -67,11 +67,19 @@ function AuthProvider({children}) {
 }
 
 function useAuthState(forceUpdate = false) {
+  const state = React.useContext(AuthContext);
+  const cookies = new Cookies();
   if(forceUpdate && sessionStorage.auth) {
     sessionStorage.removeItem("auth");
   }
 
-  const state = React.useContext(AuthContext);
+  if(!cookies.get("authToken")) {
+    return {
+      status: "error",
+      isSignedIn: false
+    }
+  }
+  
   return {
     status: state.status,
     ...state.data

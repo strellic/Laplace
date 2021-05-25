@@ -4,7 +4,7 @@ import {
   Row
 } from "reactstrap";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 
 import { useAuthState } from "context/auth.js";
 import { useAlertState } from "context/alert.js";
@@ -19,6 +19,7 @@ function IDEPage() {
   const navbarRef = React.createRef();
   const { isSignedIn } = useAuthState();
   const collab = new URLSearchParams(useLocation().search).get("collab");
+  const history = useHistory();
   const { setFileListOptions, setErrorOptions, setMessageOptions } = useAlertState();
 
   const [files, setFiles] = React.useState([]);
@@ -76,9 +77,10 @@ function IDEPage() {
   }
 
   if(!isSignedIn) {
-    window.location = "/";
-    return;
+    history.push("/");
+    return <></>;
   }
+  
   return (
     <div className="room-wrapper">
       <Navbar transparent={false} fixed={false} className="mb-0" innerRef={navbarRef} />
