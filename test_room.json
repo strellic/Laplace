@@ -5,103 +5,107 @@
         {
             "title": "Welcome!",
             "markdown": "Welcome to Laplace!\n\nLaplace is an open-source, collaborative, and free coding environment for everyone to use. People can join rooms to learn about many topics and try challenges or even make their own rooms themselves.\n\nThis room has a set of very simple programming challenges to test yourself and your knowledge. Feel free to complete them with any of the languages supported, and finish all the challenges to complete this room!\n\nGood luck!",
-            "type": "info",
-            "files": []
+            "type": "info"
         },
         {
             "title": "Hello, world!",
-            "markdown": "#### **Learning Objectives:**\n##### Learn how to print to the screen!\n##### **Description:**\n##### Hello, world!\n##### Let's start off with a simple Hello, world! program.\n#### **Input Format:**\n#####  Your program's output should not change whether it receives any input or not.\n#### **Output Format:**\n###### `\"Hello, world!\"`",
+            "markdown": "#### **Learning Objectives:**\n##### Learn how to print to the screen!\n##### **Description:**\n##### Hello, world!\n##### Let's start off with a simple Hello, world! program.\n#### **Input Format:**\n#####  Your program's output should not change whether it receives any input or not.\n#### **Output Format:**\n###### `Hello, world!`",
             "type": "coding",
-            "checks": [
-                {
-                    "stdin": "",
-                    "stdout": "Hello, world!"
-                },
-                {
-                    "stdin": "abcdefg",
-                    "stdout": "Hello, world!"
-                },
-                {
-                    "stdin": "123\n456",
-                    "stdout": "Hello, world!"
-                }
-            ],
-            "files": []
+            "coding": {
+                "checks": [
+                    {
+                        "stdin": "",
+                        "stdout": "Hello, world!"
+                    },
+                    {
+                        "stdin": "abcdefg",
+                        "stdout": "Hello, world!"
+                    },
+                    {
+                        "stdin": "123\n456",
+                        "stdout": "Hello, world!"
+                    }
+                ]
+            }
         },
         {
             "title": "Calculator",
             "markdown": "#### **Learning Objectives:**\n##### Basic arithmetic and if else statements\n##### **Description:**\n##### Hello, world!\n##### BEEP BOOP BEEP BEEP BOOP - Translation: Hey, Im BobBot. I have a test today for my Math class but my math.js file isn't working. I need you to create one for me. Use the word add for addition, sub for subtraction, mul for multiplication, and div for division.\n#### **Sample Input:**\n`23 3 add`\n\n`33 3 sub`\n\n`5 9 mul`\n\n`16 4 div`\n#### **Sample Output:**\n`26`\n\n`30`\n\n`45`\n\n`4`",
             "type": "coding",
-            "checks": [
-                {
-                    "stdin": "324 432 add",
-                    "stdout": "756"
-                },
-                {
-                    "stdin": "14 7 sub",
-                    "stdout": "7"
-                },
-                {
-                    "stdin": "1337 7331 mul",
-                    "stdout": "9801547"
-                },
-                {
-                    "stdin": "256 16 div",
-                    "stdout": "16"
-                }
-            ],
-            "files": []
+            "coding": {
+                "checks": [
+                    {
+                        "stdin": "324 432 add",
+                        "stdout": "756"
+                    },
+                    {
+                        "stdin": "14 7 sub",
+                        "stdout": "7"
+                    },
+                    {
+                        "stdin": "1337 7331 mul",
+                        "stdout": "9801547"
+                    },
+                    {
+                        "stdin": "256 16 div",
+                        "stdout": "16"
+                    }
+                ]
+            }
         },
         {
             "title": "Fibonacci",
             "markdown": "#### **Description:**\n#####\tEver heard of the Fibonacci sequence. If you haven't, it looks like this 1, 1, 2, 3, 5, 8, 13, 21 The concept behind this sequence is that your next number is the current number + the previous number. Create a program that gives you the nth term of Fibonacci.\n#### **Sample Input:**\n`0`\n\n`1`\n\n`2`\n\n`3`\n\n`7`\n\n#### **Sample Output:**\n`1`\n\n`1`\n\n`2`\n\n`3`\n\n`21`",
             "type": "coding",
-            "checks": [
-                {
-                    "stdin": "17",
-                    "stdout": "1597"
-                },
-                {
-                    "stdin": "21",
-                    "stdout": "10946"
-                },
-                {
-                    "stdin": "34",
-                    "stdout": "5702887"
-                }
-            ],
-            "files": []
+            "coding": {
+                "checks": [
+                    {
+                        "stdin": "17",
+                        "stdout": "1597"
+                    },
+                    {
+                        "stdin": "21",
+                        "stdout": "10946"
+                    },
+                    {
+                        "stdin": "34",
+                        "stdout": "5702887"
+                    }
+                ]
+            }
         },
         {
             "title": "Reverse",
             "markdown": "Reverse a string! But, there's a twist - **don't** use brackets ([])!\n\n###### Example input:\n`abcdefg`\n###### Example output:\n`gfedcba`\n\nMake sure to preserve all special characters and capitalization! The autograder will also check for the presence of brackets `[]` in your code, so don't use them!",
             "type": "coding",
-            "checks": [
-                {
-                    "stdin": "abc",
-                    "stdout": "cba",
-                    "hint": "Are you sure you're reversing the string correctly?"
-                },
-                {
-                    "stdin": "ABC DEF",
-                    "stdout": "FED CBA",
-                    "hint": "Are you sure you're preserving special characters and capitalization?"
-                },
-                {
-                    "code": "\\[",
-                    "output": "",
-                    "multiline": true,
-                    "fail": true,
-                    "hint": "Your code contains brackets!"
-                },
-                {
-                    "code": "\\]",
-                    "output": "",
-                    "multiline": true,
-                    "fail": true,
-                    "hint": "Your code contains brackets!"
-                }
-            ]
+            "coding": {
+                "checks": [
+                    {
+                        "stdin": "abc",
+                        "stdout": "cba",
+                        "hint": "Are you sure you're reversing the string correctly?"
+                    },
+                    {
+                        "stdin": "ABC DEF",
+                        "stdout": "FED CBA",
+                        "hint": "Are you sure you're preserving special characters and capitalization?"
+                    },
+                    {
+                        "code": "\\[",
+                        "output": "",
+                        "multiline": true,
+                        "fail": true,
+                        "hint": "Your code contains brackets!"
+                    },
+                    {
+                        "code": "\\]",
+                        "output": "",
+                        "multiline": true,
+                        "fail": true,
+                        "hint": "Your code contains brackets!"
+                    }
+                ]
+            }
         }
     ],
     "public": true

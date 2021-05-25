@@ -47,13 +47,13 @@ function ViewPage() {
   let storageKey = `rooms.${room.code}.num`;
 
   const checkCompletion = React.useCallback((room, section, force = false) => {
-    // if author viewing, checks will be the array of test cases
-    // if student viewing, checks will be a boolean
-    let hasChecks = (Array.isArray(section.checks) && section.checks.length > 0)
-                    || (!Array.isArray(section.checks) && section.checks);  
-
     if(!section.completed || force) {
-      if(section.type === "info" || (section.type === "jsapp" && force) || (section.type === "coding" && !hasChecks) || (section.type === "quiz" && answer) || (section.type === "flag" && flag)) {
+      if(section.type === "info"
+        || (section.type === "jsapp" && force)
+        || (section.type === "coding" && section.coding.checks.length === 0)
+        || (section.type === "quiz" && answer)
+        || (section.type === "flag" && flag)) {
+
         fetch(process.env.REACT_APP_API_URL + "/room/complete", {
           method: "POST",
           headers: {
@@ -62,7 +62,9 @@ function ViewPage() {
           body: JSON.stringify({ room: room.code, section: section.code, answer, flag })
         }).then(resp => resp.json()).then(json => {
           if(json.success) {
-            complete(room, section, section.type === "info" || (section.type === "coding" && !hasChecks));
+            complete(room, section, 
+              section.type === "info"
+              || (section.type === "coding" && section.coding.checks.length === 0));
           }
           else {
             setMessageOptions({title: "Info", body: json.response});
@@ -123,12 +125,12 @@ function ViewPage() {
 
   React.useEffect(() => {
     if(section.type === "jsapp" && !iframeRef.current.src) {
-      if(section.files.length > 0) {
+      if(section.jsapp.files.length > 0) {
         let file;
-        if(section.files.find(f => f.folder === "/") && section.files.find(f => f.folder === "/").files.find(f => f.filename === "index.html")) 
-          file = section.files.find(f => f.folder === "/").files.find(f => f.filename === "index.html");
+        if(section.jsapp.files.find(f => f.folder === "/") && section.jsapp.files.find(f => f.folder === "/").files.find(f => f.filename === "index.html")) 
+          file = section.jsapp.files.find(f => f.folder === "/").files.find(f => f.filename === "index.html");
         else
-          file = section.files[0].files[0];
+          file = section.jsapp.files[0].files[0];
         iframeRef.current.src = process.env.REACT_APP_API_URL + "/file/" + file.code;
       }
       window.onmessage = (e) => {
@@ -228,10 +230,10 @@ function ViewPage() {
                   key={section.code}
                   room={room.code}
                   section={section.code}
-                  files={section.files}
-                  lang={section.lang}
+                  files={section.coding.files}
+                  lang={section.coding.lang}
                   storageKey={`rooms.${room.code}.${section.code}`}
-                  checks={(Array.isArray(section.checks) && section.checks.length > 0) || (!Array.isArray(section.checks) && section.checks)}
+                  checks={section.coding.checks}
                   onComplete={() => {complete(room, section)}}
                 />
               </>
@@ -246,9 +248,9 @@ function ViewPage() {
                   {RoomButtons(num)}
                 </Col>
                 <Col className="room-col-text col-6 pl-3">
-                  <h4>{section.question}</h4>
+                  <h4>{section.quiz.question}</h4>
                   <Form className="ml-4">
-                    {section.answers.map((answer, i) => 
+                    {section.quiz.answers.map((answer, i) => 
                       <div key={`answer_${i}`}>
                         <Input
                           type="radio"

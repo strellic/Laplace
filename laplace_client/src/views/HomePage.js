@@ -19,7 +19,7 @@ import InputModal from "components/Modals/InputModal.js";
 import MessageModal from "components/Modals/MessageModal.js";
 
 function HomePage() {
-  const { isSignedIn } = useAuthState();
+  const { isSignedIn } = useAuthState(true);
 
   const [joinModal, setJoinModal] = React.useState(false);
   const [messageModal, setMessageModal] = React.useState(false);

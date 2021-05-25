@@ -17,87 +17,129 @@ const ajv = new Ajv.default({
   allErrors: true,
 });
 
+const FILE_SCHEMA = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [ "folder", "files" ],
+        "properties": {
+            "folder": { "type": "string" },
+            "files": {
+                "type": "array",
+                "items": {
+                    "additionalProperties": false,
+                    "required": [ "filename", "mimetype", "code", "size" ],
+                    "type": "object",
+                    "properties": {
+                        "filename": { "type": "string" },
+                        "mimetype": { "type": "string" },
+                        "code": { "type": "string" },
+                        "size": { "type": "number" }
+                    }
+                }
+            }
+        }
+    }
+};
+
 const ROOM_SCHEMA = {
-	"type": "object",
-	"title": "Room",
-	"required": ["title", "desc"],
-	"properties": {
-		"title": { "type": "string", "minLength": 3, "maxLength": 30 },
-		"desc": { "type": "string", "minLength": 3, "maxLength": 280 },
-        "public": { "type": "boolean" },
-		"sections": {
-			"type": "array",
-     		"items": {
-     			"additionalProperties": false,
-				"required": [ "title", "type" ],
-				"type": "object",
-     			"properties": {
-					"title": { "type": "string", "minLength": 3, "maxLength": 30 },
-					"type": { "enum": ["info", "coding", "quiz", "flag", "jsapp"] },
-					"code": { "type": "string" },
-					"markdown": { "type": "string" },
-					"lang": { "type": "string" },
-					"checks": { 
-						"type": "array",
-						"items": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"stdin": { "type": "string" },
-								"stdout": { "type": "string" },
+    "type": "object",
+    "title": "Room",
+    "required": ["title", "desc"],
+    "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "desc": { "type": "string", "minLength": 3, "maxLength": 280 },
+        // "code" property not allowed for rooms
+        "sections": {
+            "type": "array",
+            "items": {
+                "additionalProperties": false,
+                "required": [ "title", "type" ],
+                "type": "object",
+                "properties": {
+                    "title": { "type": "string", "minLength": 3, "maxLength": 30 },
+                    "type": { "enum": ["info", "coding", "quiz", "flag", "jsapp"] },
+                    "code": { "type": "string" },
+                    "markdown": { "type": "string" },
+                    "lang": { "type": "string" },
 
-								"code": { "type": "string" },
-								"output": { "type": "string" },
-								"multiline": { "type": "boolean" },
-								"fail": { "type": "boolean" },
 
-								"hint": { "type": "string" }
-							}
-						}
-					},
-					"question": { "type": "string" },
-					"answers": { 
-						"type": "array",
-						"items": {
-							"type": "object",
-							"required": ["choice", "correct"],
-							"additionalProperties": false,
-							"properties": {
-								"choice": { "type": "string"},
-								"correct": { "type": "boolean"}
-							}
-						}
-					},
-					"files": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"required": ["folder", "files"],
-							"additionalProperties": false,
-							"properties": {
-								"folder": { "type": "string" },
-								"files": {
-									"type": "array",
-									"items": {
-										"type": "object",
-										"required": ["filename", "code", "size"],
-										"additionalProperties": false,
-										"properties": {
-											"filename": { "type": "string"},
-											"code": { "type": "string" },
-											"size": { "type": "number" }
-										}
-									}
-								}
-							}
-						}
-					},
-					"flag": { "type": "string" }
-				}
-     		}
-		}
-	},
-	"additionalProperties": false
+                    "info": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "image": { "type": "string" }
+                        }
+                    },
+
+                    "coding": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "lang": { "type": "string" },
+                            "files": FILE_SCHEMA,
+                            "checks": {
+                                "type": "array",
+                                "items": {
+                                    "additionalProperties": false,
+                                    "type": "object",
+                                    "properties": {
+                                        // code fd checks
+                                        "stdin": { "type": "string" },
+                                        "stdout": { "type": "string" },
+                                        // code regex/style checks
+                                        "code": { "type": "string" },
+                                        "output": { "type": "string" },
+                                        "multiline": { "type": "boolean" },
+                                        "fail": { "type": "boolean" },
+                                        // hint on test case fail
+                                        "hint": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+                    "quiz": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [ "question" ],
+                        "properties": {
+                            "question": { "type": "string" },
+                            "answers": { 
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["choice", "correct"],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "choice": { "type": "string"},
+                                        "correct": { "type": "boolean"}
+                                    }
+                                }
+                            },
+                            // whether all answers that are correct are required
+                            "all": { "type": "boolean" },
+                        }
+                    },
+
+                    "flag": { "type": "string" },
+
+                    "jsapp": {
+                        "type": "object",
+                        "required": ["files"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "files": FILE_SCHEMA
+                        }
+                    }
+                }
+            }
+        },
+        "public": { "type": "boolean" }
+    },
+    "additionalProperties": false
 };
 
 router.get("/count", async (req, res) => {
@@ -127,7 +169,8 @@ router.post("/create", authenticate.requiresLogin, async (req, res) => {
 
 		let sections = [];
 		for(let i = 0; i < roomData.sections.length; i++) {
-			let section = new Section({...roomData.sections[i], code: uuidv4()});
+			let section = new Section(roomData.sections[i]);
+            section.code = uuidv4();
 			section.room = room;
 			await section.save();
 			sections.push(section);
@@ -142,6 +185,7 @@ router.post("/create", authenticate.requiresLogin, async (req, res) => {
 		return res.json(response.success("Room created successfully."));
 	}
 	catch(err) {
+        console.log(err);
 		return res.json(response.failure("There was an error saving your room. Please try again."));
 	}
 });
@@ -174,7 +218,8 @@ router.post("/edit", authenticate.requiresLogin, async (req, res) => {
 				sections.push(section);
 			}
 			else {
-				let section = new Section({...sectionData, code: uuidv4()});
+				let section = new Section(sectionData);
+                section.code = uuidv4();
 				section.room = room;	
 				sections.push(section);
 				await section.save();
@@ -184,7 +229,7 @@ router.post("/edit", authenticate.requiresLogin, async (req, res) => {
 		let remove = {
 			ids: [],
 			codes: []
-		}
+		};
 		for(let i = 0; i < room.sections.length; i++) {
 			if(!sections.find(section => section.code === room.sections[i].code)) {
 				remove.ids.push(room.sections[i]._id);
@@ -275,7 +320,7 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
 			clone.sections = response.sanitize(clone.sections, ["flag"]);
 			for(let i = 0; i < clone.sections.length; i++) {
 				if(clone.sections[i].type === "coding")
-					clone.sections[i].checks = (clone.sections[i].checks.length > 0); 
+					clone.sections[i].checks = clone.sections[i].checks.map(c => true); 
 				if(clone.sections[i].type === "quiz") {
 					clone.sections[i].answers = clone.sections[i].answers.map(answer => ({choice: answer.choice}));
 				}

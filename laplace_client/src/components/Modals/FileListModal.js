@@ -23,7 +23,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
   const [space, setSpace] = React.useState(0);
   const [cwd, setCwd] = React.useState("/");
 
-  const { setConfirmOptions, setErrorOptions, setMessageOptions, setDragDropOptions, setInputOptions } = useAlertState();
+  const { setPleaseWaitOptions, setConfirmOptions, setErrorOptions, setMessageOptions, setDragDropOptions, setInputOptions } = useAlertState();
 
   const refresh = React.useCallback(() => {
     fetch(process.env.REACT_APP_API_URL + "/file/list", {
@@ -124,6 +124,8 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
 
   const upload = (files) => {
     if(files && files[0]) {
+      setPleaseWaitOptions({isOpen: true});
+
       let file = files[0];
 
       let formData = new FormData();
@@ -134,6 +136,8 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
         method: 'POST',
         body: formData
       }).then(r => r.json()).then(json => {
+        setPleaseWaitOptions({isOpen: false});
+
         if(json.success)
           setMessageOptions({body: json.response});
         else

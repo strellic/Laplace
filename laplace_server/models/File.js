@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const fileSchema = Schema({
-    owner: [{
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }],
+    },
     filename: {
         type: String,
         required: true

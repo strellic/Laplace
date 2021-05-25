@@ -7,6 +7,7 @@ import ErrorModal from "components/Modals/ErrorModal.js";
 import SelectModal from "components/Modals/SelectModal.js";
 import DragDropModal from "components/Modals/DragDropModal.js";
 import FileListModal from "components/Modals/FileListModal.js";
+import PleaseWaitModal from "components/Modals/PleaseWaitModal.js";
 
 const AlertContext = React.createContext();
 
@@ -31,6 +32,9 @@ function AlertProvider({children}) {
 
   const [fileListOptions, setFileListOptions] = React.useState({});
   const [fileListModal, setFileListModal] = React.useState(null);
+
+  const [pleaseWaitOptions, setPleaseWaitOptions] = React.useState({});
+  const [pleaseWaitModal, setPleaseWaitModal] = React.useState(null);
 
   React.useEffect(() => {
     if(Object.keys(inputOptions).length)
@@ -60,6 +64,10 @@ function AlertProvider({children}) {
     if(Object.keys(fileListOptions).length)
       setFileListModal(true);
   }, [fileListOptions]);
+  React.useEffect(() => {
+    if(Object.keys(pleaseWaitOptions).length)
+      setPleaseWaitModal(true);
+  }, [pleaseWaitOptions]);
 
   const state = {
     setInputOptions,
@@ -68,7 +76,8 @@ function AlertProvider({children}) {
     setErrorOptions,
     setSelectOptions,
     setDragDropOptions,
-    setFileListOptions
+    setFileListOptions,
+    setPleaseWaitOptions
   }
 
   return (
@@ -80,7 +89,7 @@ function AlertProvider({children}) {
       <SelectModal open={setSelectModal} isOpen={selectModal} {...selectOptions} />
       <DragDropModal open={setDragDropModal} isOpen={dragDropModal} {...dragDropOptions} />
       <FileListModal open={setFileListModal} isOpen={fileListModal} {...fileListOptions} />
-
+      <PleaseWaitModal open={setPleaseWaitModal} isOpen={pleaseWaitModal} {...pleaseWaitOptions} />
       {children}
     </AlertContext.Provider>
   )

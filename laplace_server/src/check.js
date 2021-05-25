@@ -28,7 +28,7 @@ const complete = (user, room, section) => {
 }
 
 const coding = (emit, user, room, section, lang, files) => {
-	let checks = section.checks;
+	let checks = section.coding.checks;
 
 	let testCases = checks.filter(c => c.stdin || c.stdout);
 	let codeChecks = checks.filter(c => c.code || c.output);
@@ -131,7 +131,7 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, fl
 		}
 		section = room.sections.find(find => find.code === section);
 
-		if(section.type === "coding" && section.checks.length > 0) {
+		if(section.type === "coding" && section.coding.checks.length > 0) {
 			if(!lang || typeof lang !== 'string') {
 				return error("Missing lang.");
 			}
@@ -140,12 +140,14 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, fl
 			}
 			return coding(emit, user, room, section, lang, files);
 		}
-		else if(section.type === "info" || (section.type === "coding" && section.checks.length === 0) || section.type === "jsapp") {
+		else if(section.type === "info"
+            || (section.type === "coding" && section.coding.checks.length === 0)
+            || section.type === "jsapp") {
 			complete(user, room, section);
 			return success("Section completed!");
 		}
 		else if(section.type === "quiz") {
-			if(section.answers.filter(a => a.correct).map(a => a.choice).includes(answer)) {
+			if(section.quiz.answers.filter(a => a.correct).map(a => a.choice).includes(answer)) {
 				complete(user, room, section);
 				return success("Section completed!");
 			}

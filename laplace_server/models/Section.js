@@ -3,6 +3,27 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 import uniqueValidator from 'mongoose-unique-validator';
 
+const FILE_SCHEMA = [{
+    required: false,
+    folder: {
+        type: String,
+    },
+    files: [{
+        filename: {
+            type: String
+        },
+        code: {
+            type: String
+        },
+        size: {
+            type: Number
+        },
+        mimetype: {
+            type: String
+        }
+    }]
+}];
+
 const sectionSchema = Schema({
     title: {
         type: String,
@@ -24,65 +45,70 @@ const sectionSchema = Schema({
     markdown: {
         type: String
     },
-    lang: {
-        type: String
-    },
-    image: {
-        type: String
-    },
-    video: {
-        type: String
-    },
-    files: [{
-        folder: {
-            type: String,
-            required: true
+
+    // start of type-specific section data
+    info: {
+        image: {
+            type: String
         },
-        files: [{
-            filename: {
+        required: false
+    },
+
+    coding: {
+        lang: {
+            type: String
+        },
+        files: FILE_SCHEMA,
+        checks: [{
+            stdin: String,
+            stdout: String,
+
+            code: String,
+            output: String,
+            multiline: Boolean,
+            fail: Boolean,
+
+            hint: String
+        }],
+        required: false
+    },
+
+    quiz: {
+        question: {
+            type: String,
+        },
+        answers: [{
+            choice: {
                 type: String,
-                required: true
             },
-            code: {
-                type: String,
-                required: true
-            },
-            size: {
-                type: Number,
-                required: true
+            correct: {
+                type: Boolean,
             }
-        }]
-    }],
-    checks: [{
-        stdin: String,
-        stdout: String,
-
-        code: String,
-        output: String,
-        multiline: Boolean,
-        fail: Boolean,
-
-        hint: String
-    }],
-    question: {
-        type: String
+        }],
+        all: {
+            type: Boolean,
+            default: false
+        },
+        required: false
     },
-    answers: [{
-        choice: String,
-        correct: Boolean
-    }],
+
     flag: {
-        type: String
+        type: String,
+        required: false
     },
+
+    jsapp: {
+        files: FILE_SCHEMA,
+        required: false
+    },
+
+    // end of type-specific section data
+
     room: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room'
     }
-    /*
-    image: {
-        type: String
-    }
-    */
+
 });
 sectionSchema.plugin(uniqueValidator);
 export default mongoose.model('Section', sectionSchema);

@@ -20,46 +20,39 @@ router.post("/upload", [authenticate.requiresLogin, upload.single('file')], asyn
 		return res.json(response.failure("No file uploaded!"));
 	}
 
-	if(req.file.buffer.length >= 8*1024*1024) {
+	if(req.file.buffer.length > 8*1024*1024) {
 		return res.json(response.failure("The file is too large."));
 	}
 
 	let folder = req.body.folder || "/";
 	let total = 0;
 
-	File.find({owner: req.user}, async (err, files) => {
+	if(req.user.size + req.file.buffer.length > 128*1024*1024)
+		return res.json(response.failure("You have hit the max storage cap of 128MB."));
+
+	let code = uuidv4();
+	File.create({
+		filename: req.file.originalname.replace(/\//g, ""),
+		data: req.file.buffer,
+		mimetype: req.file.mimetype,
+		code,
+		size: req.file.buffer.length,
+		owner: req.user
+	}, async (err, item) => {
 		if(err)
-			return res.json(response.failure("There was an error listing your files."));
-		
-		for(let i = 0; i < files.length; i++)
-			total += files[i].size;
+			return res.json(response.failure("There was an error uploading your file."));
 
-		if(total + req.file.buffer.length >= 128*1024*1024)
-			return res.json(response.failure("You have hit the max storage cap of 128MB."));
+		let location = req.user.storage.find(s => s.folder === folder);
+		if(!location) {
+			req.user.storage.push({folder, files: []});
+			location = req.user.storage.find(s => s.folder === folder);
+		}
 
-		let code = uuidv4();
-		File.create({
-			filename: req.file.originalname.replace(/\//g, ""),
-			data: req.file.buffer,
-			mimetype: req.file.mimetype,
-			code,
-			size: req.file.buffer.length,
-			owner: req.user
-		}, async (err, item) => {
-			if(err)
-				return res.json(response.failure("There was an error uploading your file."));
+		location.files.push({filename: item.filename, code: item.code, size: item.size, mimetype: req.file.mimetype});
+        req.user.size += req.file.buffer.length;
+		await req.user.save();
 
-			let location = req.user.storage.find(s => s.folder === folder);
-			if(!location) {
-				req.user.storage.push({folder, files: []});
-				location = req.user.storage.find(s => s.folder === folder);
-			}
-
-			location.files.push({filename: item.filename, code: item.code, size: item.size});
-			await req.user.save();
-
-			return res.json(response.success("File uploaded successfully."));
-		});
+		return res.json(response.success("File uploaded successfully."));
 	});
 });
 
@@ -107,7 +100,7 @@ router.post("/update", authenticate.requiresLogin, async (req, res) => {
 					await File.deleteOne({owner: req.user, code: file.code});
 					location.files = location.files.filter(f => f.code !== file.code);
 				}
-				location.files.push({filename: file.filename, code: code, size: file.content.length});
+				location.files.push({filename: file.filename, code: code, size: file.content.length, mimetype: req.file.mimetype});
 				await File.create({
 					filename: file.filename,
 					data: Buffer.from(file.content),
@@ -159,6 +152,7 @@ router.post("/delete", authenticate.requiresLogin, async (req, res) => {
 		return res.json(response.failure("Bad file specified!"));
 	}
 
+    req.user.size -= file.size;
 	location.files = location.files.filter(f => f.code !== req.body.code);
 	req.user.save();
 
@@ -177,8 +171,10 @@ router.post("/del_folder", authenticate.requiresLogin, async (req, res) => {
 	let folders = req.user.storage.filter(s => s.folder.startsWith(req.body.folder));
 	let files = [];
 
+    let size = 0;
 	for(let folder of folders) {
 		files = files.concat(folder.files.map(f => f.code));
+        size += files.reduce((a, v) => a += v.size, 0);
 	}
 
 	File.deleteMany({owner: req.user, code: {$in: files}}, async (err) => {
@@ -186,6 +182,7 @@ router.post("/del_folder", authenticate.requiresLogin, async (req, res) => {
 			return res.json(response.failure("Unable to delete folder."));
 
 		req.user.storage = req.user.storage.filter(s => !s.folder.startsWith(req.body.folder));
+        req.user.size -= size;
 		await req.user.save();
 		return res.json(response.success("Folder successfully deleted."));
 	});

@@ -28,14 +28,14 @@ function EditSection({open, isOpen, submit, section}){
 
   const validTypes = ["info", "coding", "quiz", "flag", "jsapp"];
 
-  const [checks, setChecks] = React.useState(section.checks || []);
+  const [checks, setChecks] = React.useState(section.coding?.checks || []);
 
   const [flag, setFlag] = React.useState(section.flag || "");
 
-  const [question, setQuestion] = React.useState(section.question || "");
-  const [answers, setAnswers] = React.useState(section.answers || []);
+  const [question, setQuestion] = React.useState(section.quiz?.question || "");
+  const [answers, setAnswers] = React.useState(section.quiz?.answers || []);
 
-  const [files, setFiles] = React.useState(section.files || []);
+  const [files, setFiles] = React.useState((section.type === "coding" ? section.coding?.files : section.jsapp?.files) || []);
 
   const [langsList, setLangsList] = React.useState([]);
   const [lang, setLang] = React.useState("");
@@ -76,30 +76,38 @@ function EditSection({open, isOpen, submit, section}){
   MdEditor.use(Insert);
   const mdParser = new MarkdownIt();
 
-  const finish = () => {
+  const finish = async () => {
     let completed = {
       title,
-      markdown,
       type,
+      markdown
     };
-    if(type === "coding") {
-      completed.checks = checks.map(c => ({stdin: c.stdin, stdout: c.stdout, code: c.code, output: c.output, multiline: c.multiline, fail: c.fail, hint: c.hint}));
-    }
-    if(type === "flag")
-      completed.flag = flag;
-    if(type === "quiz") {
-      completed.question = question;
-      completed.answers = answers;
-    }
 
-    if((type === "coding" || type === "jsapp") && files.length !== 0) {
-    	completed.files = files;
+    switch(type) {
+      case "info":
+        break;
+      case "coding":
+        completed.coding = {};
+        if(lang.lang !== "All" && langsList.find(l => l === lang)) {
+          completed.coding.lang = lang.lang;
+        }
+        completed.coding.checks = checks.map(c => ({...c, desc: undefined}));
+        completed.coding.files = files;
+        break;
+      case "flag":
+        completed.flag = flag;
+        break;
+      case "quiz":
+        completed.quiz = {};
+        completed.quiz.question = question;
+        completed.quiz.answers = answers;
+        break;
+      case "jsapp":
+        completed.jsapp = {files};
+        break;
+      default:
+        break;
     }
-
-    if(lang.lang !== "All" && langsList.find(l => l === lang)) {
-      completed.lang = lang.lang;
-    }
-
     if(section.code)
       completed.code = section.code;
 

@@ -66,7 +66,11 @@ function AuthProvider({children}) {
   )
 }
 
-function useAuthState() {
+function useAuthState(forceUpdate = false) {
+  if(forceUpdate && sessionStorage.auth) {
+    sessionStorage.removeItem("auth");
+  }
+
   const state = React.useContext(AuthContext);
   return {
     status: state.status,

@@ -69,9 +69,18 @@ const userSchema = Schema({
             size: {
                 type: Number,
                 required: true
+            },
+            mimetype: {
+                type: String,
+                required: true
             }
         }]
-    }]
+    }],
+    size: {
+        type: Number,
+        min: 0,
+        default: 0
+    }
 });
 
 userSchema.plugin(uniqueValidator);
