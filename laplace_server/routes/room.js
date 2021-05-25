@@ -320,9 +320,9 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
 			clone.sections = response.sanitize(clone.sections, ["flag"]);
 			for(let i = 0; i < clone.sections.length; i++) {
 				if(clone.sections[i].type === "coding")
-					clone.sections[i].checks = clone.sections[i].checks.map(c => true); 
+					clone.sections[i].coding.checks = clone.sections[i].coding.checks.map(c => true); 
 				if(clone.sections[i].type === "quiz") {
-					clone.sections[i].answers = clone.sections[i].answers.map(answer => ({choice: answer.choice}));
+					clone.sections[i].quiz.answers = clone.sections[i].quiz.answers.map(answer => ({choice: answer.choice}));
 				}
 			}
             delete clone.members;
