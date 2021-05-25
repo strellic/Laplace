@@ -31,11 +31,10 @@ const FILE_SCHEMA = {
                 "type": "array",
                 "items": {
                     "additionalProperties": false,
-                    "required": [ "filename", "mimetype", "code", "size" ],
+                    "required": [ "filename", "code", "size" ],
                     "type": "object",
                     "properties": {
                         "filename": { "type": "string" },
-                        "mimetype": { "type": "string" },
                         "code": { "type": "string" },
                         "size": { "type": "number" }
                     }

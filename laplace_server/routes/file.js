@@ -48,7 +48,7 @@ router.post("/upload", [authenticate.requiresLogin, upload.single('file')], asyn
 			location = req.user.storage.find(s => s.folder === folder);
 		}
 
-		location.files.push({filename: item.filename, code: item.code, size: item.size, mimetype: req.file.mimetype});
+		location.files.push({filename: item.filename, code: item.code, size: item.size});
         req.user.size += req.file.buffer.length;
 		await req.user.save();
 
@@ -100,7 +100,7 @@ router.post("/update", authenticate.requiresLogin, async (req, res) => {
 					await File.deleteOne({owner: req.user, code: file.code});
 					location.files = location.files.filter(f => f.code !== file.code);
 				}
-				location.files.push({filename: file.filename, code: code, size: file.content.length, mimetype: req.file.mimetype});
+				location.files.push({filename: file.filename, code: code, size: file.content.length});
 				await File.create({
 					filename: file.filename,
 					data: Buffer.from(file.content),
