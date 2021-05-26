@@ -91,6 +91,7 @@ html, body, #root {
 	width:50%;
 	transform:translateY(-15%)
 }
+
 .ide {
 	padding: 0;
 	width: 100%;
@@ -233,4 +234,48 @@ html, body, #root {
 
 p, span, h1, h2, h3, h4, h5, h6 {
 	font-weight: 500 !important;
+}
+
+.navbar {
+    height: 4rem !important;
+    z-index: 2;
+}
+.below-navbar {
+    height: calc(100% - 4rem) !important;
+}
+.room-content {
+    flex: 1 0 auto;
+    position: relative;
+}
+
+.c-half-l {
+    position: absolute;
+    inset: 0% 50% 0% 0%;
+}
+.c-small-l {
+    position: absolute;
+    inset: 0% 66.6666% 0% 0%;
+}
+.c-large-l {
+    position: absolute;
+    inset: 0% 33.3333% 0% 0%;
+}
+
+.c-half-r {
+    position: absolute;
+    inset: 0% 0% 0% 50%;
+}
+.c-small-r {
+    position: absolute;
+    inset: 0% 0% 0% 66.6666%;
+}
+.c-large-r {
+    position: absolute;
+    inset: 0% 0% 0% 33.3333%;
+}
+
+.c-info-img {
+    height: 66%;
+    width: auto;
+    margin: 0 auto;
 }

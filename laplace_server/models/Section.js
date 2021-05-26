@@ -3,25 +3,24 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 import uniqueValidator from 'mongoose-unique-validator';
 
-const FILE_SCHEMA = [{
+const FILE_SCHEMA = {
+    filename: {
+        type: String
+    },
+    code: {
+        type: String
+    },
+    size: {
+        type: Number
+    }
+};
+
+const STORAGE_SCHEMA = [{
     required: false,
     folder: {
         type: String,
     },
-    files: [{
-        filename: {
-            type: String
-        },
-        code: {
-            type: String
-        },
-        size: {
-            type: Number
-        },
-        mimetype: {
-            type: String
-        }
-    }]
+    files: [FILE_SCHEMA]
 }];
 
 const sectionSchema = Schema({
@@ -32,7 +31,7 @@ const sectionSchema = Schema({
     },
     type: {
         type: String,
-        enum: ["info", "coding", "quiz", "flag", "jsapp"/*, "web", "docker"*/],
+        enum: ["info", "coding", "quiz", "flag", "website"/*, "web", "docker"*/],
         required: true
     },
     code: {
@@ -45,12 +44,14 @@ const sectionSchema = Schema({
     markdown: {
         type: String
     },
+    layout: {
+        type: Number,
+        default: 0
+    },
 
     // start of type-specific section data
     info: {
-        image: {
-            type: String
-        },
+        image: FILE_SCHEMA,
         required: false
     },
 
@@ -58,7 +59,7 @@ const sectionSchema = Schema({
         lang: {
             type: String
         },
-        files: FILE_SCHEMA,
+        files: STORAGE_SCHEMA,
         checks: [{
             stdin: String,
             stdout: String,
@@ -97,8 +98,14 @@ const sectionSchema = Schema({
         required: false
     },
 
-    jsapp: {
-        files: FILE_SCHEMA,
+    website: {
+        url: {
+            type: String
+        },
+        autopass: {
+            type: Boolean,
+            default: true
+        },
         required: false
     },
 

@@ -22,13 +22,15 @@ import fetch from "utils/fetch.js";
 import { useAlertState } from "context/alert.js";
 
 function EditSection({open, isOpen, submit, section}){
-  const { setFileListOptions, setSelectOptions } = useAlertState();
+  const { setFileListOptions, setSelectOptions, setErrorOptions } = useAlertState();
 
   const [title, setTitle] = React.useState(section.title || "");
   const [markdown, setMarkdown] = React.useState(section.markdown || "");
   const [type, setType] = React.useState(section.type || "info");
 
-  const validTypes = ["info", "coding", "quiz", "flag", "jsapp"];
+  const validTypes = ["info", "coding", "quiz", "flag", "website"];
+
+  const [image, setImage] = React.useState(section.info?.image || {});
 
   const [checks, setChecks] = React.useState(section.coding?.checks || []);
 
@@ -36,11 +38,17 @@ function EditSection({open, isOpen, submit, section}){
 
   const [question, setQuestion] = React.useState(section.quiz?.question || "");
   const [answers, setAnswers] = React.useState(section.quiz?.answers || []);
+  const [all, setAll] = React.useState(section.quiz?.all || false);
 
-  const [files, setFiles] = React.useState((section.type === "coding" ? section.coding?.files : section.jsapp?.files) || []);
+  const [url, setURL] = React.useState("");
+  const [autopass, setAutopass] = React.useState(true);
+
+  const [files, setFiles] = React.useState(section.type === "coding" ? section.coding?.files || [] : []);
 
   const [langsList, setLangsList] = React.useState([]);
   const [lang, setLang] = React.useState("");
+
+  const [layout, setLayout] = React.useState(section.layout || 0);
 
   React.useEffect(() => {
     if(!isOpen)
@@ -82,11 +90,15 @@ function EditSection({open, isOpen, submit, section}){
     let completed = {
       title,
       type,
-      markdown
+      markdown,
+      layout
     };
 
     switch(type) {
       case "info":
+        completed.info = {
+          image: image.code ? image : undefined
+        };
         break;
       case "coding":
         completed.coding = {};
@@ -95,17 +107,28 @@ function EditSection({open, isOpen, submit, section}){
         }
         completed.coding.checks = checks.map(c => ({...c, desc: undefined}));
         completed.coding.files = files;
+        delete completed.layout;
         break;
       case "flag":
         completed.flag = flag;
         break;
       case "quiz":
-        completed.quiz = {};
-        completed.quiz.question = question;
-        completed.quiz.answers = answers;
+        completed.quiz = {question, answers, all};
         break;
-      case "jsapp":
-        completed.jsapp = {files};
+      case "website":
+        try {
+          let check = new URL(url);
+          if(!["http:", "https:"].includes(check.protocol)) {
+            return setErrorOptions({ body: "Invalid URL." });
+          }
+        }
+        catch(err) {
+          return setErrorOptions({ body: "Invalid URL." });
+        }
+        completed.website = {
+            url,
+            autopass
+        };
         break;
       default:
         break;
@@ -186,6 +209,28 @@ function EditSection({open, isOpen, submit, section}){
               onChange={({html, text}) => setMarkdown(text)}
             />
           </FormGroup>
+          {!["coding"].includes(type) && ( // only for sections with two columns
+            <FormGroup>
+              <label>Layout</label>
+              <div className="d-flex">
+                <div>
+                  <Button className="p-2" color={layout === 0 ? "info" : "secondary"} onClick={() => setLayout(0)}>
+                    <img alt="50 / 50" src={require("assets/img/section/layout0.png")} style={{"height": "4rem"}} />
+                  </Button>
+                </div>
+                <div className="ml-3">
+                  <Button className="p-2" color={layout === 1 ? "info" : "secondary"} onClick={() => setLayout(1)}>
+                    <img alt="25 / 75" src={require("assets/img/section/layout1.png")} style={{"height": "4rem"}} />
+                  </Button>
+                </div>
+                <div className="ml-3">
+                  <Button className="p-2" color={layout === 2 ? "info" : "secondary"} onClick={() => setLayout(2)}>
+                    <img alt="75 / 25" src={require("assets/img/section/layout2.png")} style={{"height": "4rem"}} />
+                  </Button>
+                </div>
+              </div>
+            </FormGroup>
+          )}
           <FormGroup>
             <label>Section Type</label>
             <Input
@@ -197,6 +242,18 @@ function EditSection({open, isOpen, submit, section}){
               {validTypes.map((type, i) => <option key={i}>{type}</option>)}
             </Input>
           </FormGroup>
+          {type === "info" && (
+            <>
+              {image && image.code ? (
+                <>
+                  <Button color="success" type="button" size="sm" onClick={() => setFileListOptions({title: "Select Image", submit: setImage, key: Math.random()})}>{image.filename}</Button>
+                  <Button color="danger" type="button" size="sm" onClick={() => setImage(null)}>Remove Image</Button>
+                </>
+              ) : (
+                <Button color="success" type="button" size="sm" onClick={() => setFileListOptions({title: "Select Image", submit: setImage, key: Math.random()})}>Set Image</Button>
+              )}
+            </>
+          )}
           {type === "coding" && (
             <FormGroup>
               <label>Checks</label>
@@ -300,17 +357,24 @@ function EditSection({open, isOpen, submit, section}){
                 </Row>
               </div>)}
               <br />
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="checkbox"
+                    checked={all}
+                    onChange={e => setAll(e.target.checked)}
+                  />
+                  <span className="form-check-sign"></span>
+                  Require All Correct Answers
+                </Label>
+              </FormGroup>
               <Button color="info" type="button" size="sm" onClick={newAns}>+</Button>
               <Button color="danger" type="button" size="sm" onClick={delAns}>-</Button>
             </FormGroup>
           )}
 
-          {(type === "coding" || type === "jsapp") && (
+          {type === "coding" && (
           	<>
-              {type === "jsapp" && (
-                <div>Upload an HTML file named 'index.html' that runs your JS code.
-                  Run the JS snippet <code>window.parent.postMessage("finish", "*");</code> to finish the section.</div>
-              )}
 	          	{files && files.length !== 0 && (
 	          		<div>
 	          			{files.map((folder, i) => (
@@ -331,6 +395,36 @@ function EditSection({open, isOpen, submit, section}){
           		<Button color="success" type="button" size="sm" onClick={() => setFileListOptions({title: "Select Folder", submitFolder: setTemplate, key: Math.random()})}>Set Template Files</Button>
           	</>
           )}
+
+          {type === "website" && (
+            <Row>
+              <Col>
+                <label>Website URL</label>
+                <Input
+                  type="text"
+                  placeholder="URL"
+                  value={url}
+                  onChange={e => setURL(e.target.value)}
+                  required
+                />
+                <FormGroup check>
+                  <Label check>
+                    <Input
+                      type="checkbox"
+                      checked={autopass}
+                      onChange={e => setAutopass(e.target.checked)}
+                    />
+                    <span className="form-check-sign"></span>
+                    Autopass
+                  </Label>
+                </FormGroup>
+                {!autopass && (
+                  <div>Run the JS snippet <code>window.parent.postMessage("finish", "*");</code> to finish the section.</div>
+                )}
+              </Col>
+            </Row>
+          )}
+
           <Button color="info" type="button" size="sm" onClick={() => setFileListOptions({title: "File Manager", key: Math.random()})}>File Manager</Button>
           
           {type === "coding" && <Button color="warning" type="button" size="sm" onClick={showLangModal}>Language: {lang.name}</Button>}

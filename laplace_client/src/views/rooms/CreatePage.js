@@ -290,11 +290,16 @@ function CreatePage() {
               </>
             )}
 
-            <Row className="pull-right">
-              <Button color="success" type="button" size="sm" onClick={() => setExportModal(true)}>Export</Button>
-              <Button color="primary" type="button" size="sm" onClick={() => setImportModal(true)}>Import</Button>
-              {isEditing && (<Button color="danger" type="button" size="sm" onClick={deleteRoom}>Delete</Button>)}
-              <Button color="info" type="button" size="sm" onClick={saveRoom}>Save</Button>
+            <Row>
+              <Col className="p-0">
+                <Button color="danger" type="button" size="sm" onClick={() => history.push("/home")}>&larr; Back</Button>
+              </Col>
+              <Col className="text-right p-0">
+                <Button color="success" type="button" size="sm" onClick={() => setExportModal(true)}>Export</Button>
+                <Button color="primary" type="button" size="sm" onClick={() => setImportModal(true)}>Import</Button>
+                {isEditing && (<Button color="danger" type="button" size="sm" onClick={deleteRoom}>Delete</Button>)}
+                <Button color="info" type="button" size="sm" onClick={saveRoom}>Save</Button>
+              </Col>
             </Row>
           </Container>
         </div>

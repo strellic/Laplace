@@ -17,9 +17,20 @@ const ajv = new Ajv.default({
   allErrors: true,
 });
 
-const SECTION_TYPES = ["info", "coding", "quiz", "flag", "jsapp"];
+const SECTION_TYPES = ["info", "coding", "quiz", "flag", "website"];
 
 const FILE_SCHEMA = {
+    "additionalProperties": false,
+    "required": [ "filename", "code", "size" ],
+    "type": "object",
+    "properties": {
+        "filename": { "type": "string" },
+        "code": { "type": "string" },
+        "size": { "type": "number" }
+    }
+};
+
+const STORAGE_SCHEMA = {
     "type": "array",
     "items": {
         "type": "object",
@@ -29,16 +40,7 @@ const FILE_SCHEMA = {
             "folder": { "type": "string" },
             "files": {
                 "type": "array",
-                "items": {
-                    "additionalProperties": false,
-                    "required": [ "filename", "code", "size" ],
-                    "type": "object",
-                    "properties": {
-                        "filename": { "type": "string" },
-                        "code": { "type": "string" },
-                        "size": { "type": "number" }
-                    }
-                }
+                "items": FILE_SCHEMA
             }
         }
     }
@@ -61,6 +63,8 @@ const ROOM_SCHEMA = {
                 "properties": {
                     "title": { "type": "string", "minLength": 3, "maxLength": 30 },
                     "type": { "enum": SECTION_TYPES },
+                    "layout": { "type": "number" },
+                    
                     "code": { "type": "string" },
                     "markdown": { "type": "string" },
                     "lang": { "type": "string" },
@@ -70,7 +74,7 @@ const ROOM_SCHEMA = {
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
-                            "image": { "type": "string" }
+                            "image": FILE_SCHEMA
                         }
                     },
 
@@ -79,7 +83,7 @@ const ROOM_SCHEMA = {
                         "additionalProperties": false,
                         "properties": {
                             "lang": { "type": "string" },
-                            "files": FILE_SCHEMA,
+                            "files": STORAGE_SCHEMA,
                             "checks": {
                                 "type": "array",
                                 "items": {
@@ -127,12 +131,16 @@ const ROOM_SCHEMA = {
 
                     "flag": { "type": "string" },
 
-                    "jsapp": {
+                    "website": {
                         "type": "object",
-                        "required": ["files"],
+                        "required": ["url"],
                         "additionalProperties": false,
                         "properties": {
-                            "files": FILE_SCHEMA
+                            "url": { 
+                                "type": "string",
+                                "pattern": "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$"
+                            },
+                            "autopass": { "type": "boolean" }
                         }
                     }
                 }

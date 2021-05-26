@@ -80,5 +80,12 @@ const userSchema = Schema({
 });
 
 userSchema.plugin(uniqueValidator);
-
+userSchema.pre('save', function(next) {
+    this.size = this.storage.reduce((a, v) => a + v.files.reduce((a2, v2) => a2 + v2.size, 0), 0);
+    next();
+});
+userSchema.pre('update', function(next) {
+    this.size = this.storage.reduce((a, v) => a + v.files.reduce((a2, v2) => a2 + v2.size, 0), 0);
+    next();
+});
 export default mongoose.model('User', userSchema);

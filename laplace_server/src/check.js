@@ -99,7 +99,7 @@ const coding = (emit, user, room, section, lang, files) => {
 	});
 }
 
-const verify = ({ emit, res, user, room, section, token, lang, files, answer, flag }) => {
+const verify = ({ emit, res, user, room, section, token, lang, files, answer, answers, flag }) => {
 	let find;
 	if(user.enrolled.find(check => check.code === room)) {
 		find = user.enrolled.find(check => check.code === room);
@@ -142,15 +142,25 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, fl
 		}
 		else if(section.type === "info"
             || (section.type === "coding" && section.coding.checks.length === 0)
-            || section.type === "jsapp") {
+            || section.type === "website") {
 			complete(user, room, section);
 			return success("Section completed!");
 		}
 		else if(section.type === "quiz") {
-			if(section.quiz.answers.filter(a => a.correct).map(a => a.choice).includes(answer)) {
-				complete(user, room, section);
-				return success("Section completed!");
-			}
+            let correct = section.quiz.answers.filter(a => a.correct).map(a => a.choice);
+			if(section.quiz.all) {
+                if(JSON.stringify(correct.sort()) === JSON.stringify(answers.sort())) {
+                    complete(user, room, section);
+                    return success("Section completed!");
+                }
+            }
+            else {
+                if((correct.length === 0 && !answer) 
+                    || correct.includes(answer) ) {
+                    complete(user, room, section);
+                    return success("Section completed!");
+                }
+            }
 			return error("Incorrect answer!");
 		}
 		else if(section.type === "flag") {

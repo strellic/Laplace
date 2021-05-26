@@ -173,6 +173,7 @@ router.post("/register", async (req, res, next) => {
         let user = new User({username, password: hash, email});
         user.save((err) => {
             if(err) {
+                console.log(err);
                 return res.json(response.failure("A user already exists with that username or email."));
             }
             passport.authenticate('local', function(err, user, info) {

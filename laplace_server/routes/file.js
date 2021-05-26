@@ -49,7 +49,6 @@ router.post("/upload", [authenticate.requiresLogin, upload.single('file')], asyn
 		}
 
 		location.files.push({filename: item.filename, code: item.code, size: item.size});
-        req.user.size += req.file.buffer.length;
 		await req.user.save();
 
 		return res.json(response.success("File uploaded successfully."));
@@ -152,9 +151,8 @@ router.post("/delete", authenticate.requiresLogin, async (req, res) => {
 		return res.json(response.failure("Bad file specified!"));
 	}
 
-    req.user.size -= file.size;
 	location.files = location.files.filter(f => f.code !== req.body.code);
-	req.user.save();
+	await req.user.save();
 
 	File.deleteOne({owner: req.user, code: req.body.code}, (err) => {
 		if(err)
@@ -182,7 +180,6 @@ router.post("/del_folder", authenticate.requiresLogin, async (req, res) => {
 			return res.json(response.failure("Unable to delete folder."));
 
 		req.user.storage = req.user.storage.filter(s => !s.folder.startsWith(req.body.folder));
-        req.user.size -= size;
 		await req.user.save();
 		return res.json(response.success("Folder successfully deleted."));
 	});

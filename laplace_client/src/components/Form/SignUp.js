@@ -1,7 +1,7 @@
 import React from "react";
 import Cookies from 'universal-cookie';
 
-import { useHistory } from "react-router-dom";
+//import { useHistory } from "react-router-dom";
 
 // reactstrap components
 import {
@@ -27,7 +27,7 @@ import fetch from "utils/fetch.js";
 
 function SignUp() {
   const cookies = new Cookies();
-  const history = useHistory();
+  //const history = useHistory();
 
   const [userFocus, setUserFocus] = React.useState(false);
   const [passFocus, setPassFocus] = React.useState(false);
@@ -67,7 +67,8 @@ function SignUp() {
 
       if(json.success) {
         cookies.set("authToken", json.response);
-        history.push("/home");
+        //history.push("/home");
+        window.location = "/home";
       }
       else {
         setError(json.response);

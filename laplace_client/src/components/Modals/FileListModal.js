@@ -206,11 +206,10 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
                   <Col className="file-list-desc">
                     {folder.split("/").pop()}
                     <div>
-                      {submitFolder ? (
+                      {submitFolder && (
                         <Button size="sm" color="info" onClick={() => {submitFolder(JSON.parse(JSON.stringify(response.filter(s => s.folder.startsWith(folder)))), folder); open(false);}}>Select</Button>
-                      ) : (
-                        <Button size="sm" color="danger" onClick={(e) => {delFolder(folder); e.stopPropagation();}}><i className="fas fa-trash"></i></Button>
-                      )}
+                      )} 
+                      <Button size="sm" color="danger" onClick={(e) => {delFolder(folder); e.stopPropagation();}}><i className="fas fa-trash"></i></Button>
                     </div>
                   </Col>
                 </Row>
@@ -222,16 +221,13 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
                   </Col>
                   <Col className="file-list-desc">
                     {file.filename} ({humanFileSize(file.size)})
-                    {submit ? (
-                      <div>
+                    <div>
+                      {submit && (
                         <Button size="sm" color="info" onClick={() => {submit(files[i]); open(false);}}>Select</Button>
-                      </div>
-                    ) : (
-                      <div>
-                        <Button size="sm" color="info" onClick={() => copyFile(i)}><i className="fas fa-copy"></i></Button>
-                        <Button size="sm" color="danger" onClick={() => delFile(i)}><i className="fas fa-trash"></i></Button>
-                      </div>
-                    )}
+                      )}
+                      <Button size="sm" color="info" onClick={() => copyFile(i)}><i className="fas fa-copy"></i></Button>
+                      <Button size="sm" color="danger" onClick={() => delFile(i)}><i className="fas fa-trash"></i></Button>
+                    </div>
                   </Col>
                 </Row>
               ))}
@@ -245,7 +241,7 @@ function FileListModal({open, isOpen, submit, submitFolder, title = "Files"}){
             </Row>
             <Row>
               <div className="progress-container progress-danger w-100">
-                <span className="progress-badge">Storage Remaining (128MB)</span>
+                <span className="progress-badge">Storage Remaining ({parseInt(128 * (1-(space / 100)))} / 128MB)</span>
                 <Progress max="100" value={space}>
                   <span className="progress-value">{parseInt(space)}%</span>
                 </Progress>
