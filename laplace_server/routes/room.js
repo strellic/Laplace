@@ -279,14 +279,15 @@ router.post("/delete", authenticate.requiresLogin, async (req, res) => {
 
 	Room.findById(check._id).populate("sections").populate("members").populate("author").exec(async (err, room) => {
 		let members = [...new Set([...room.members, room.author])];
+
 		for(let i = 0; i < members.length; i++) {
-			authenticate.getUser({_id: members[i]._id}, ["rooms"], async (err, user) => {
-				user.enrolled = user.enrolled.filter(e => e.code !== room.code);
-				user.created = user.created.filter(c => c.code !== room.code);
-				user.completed = user.completed.filter(c => c.room?.code !== room.code);
-				await user.save();
-			});
+			let member = await authenticate.getUser({_id: members[i]._id}, ["rooms"]);
+			member.enrolled = member.enrolled.filter(e => e.code !== room.code);
+			member.created = member.created.filter(c => c.code !== room.code);
+			member.completed = member.completed.filter(c => c.room?.code !== room.code);
+			await member.save();
 		}
+        
 		for(let i = 0; i < room.sections.length; i++) {
 			await room.sections[i].delete();
 		}
