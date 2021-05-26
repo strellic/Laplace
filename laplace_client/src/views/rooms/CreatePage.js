@@ -34,7 +34,7 @@ import ImportModal from "components/Modals/ImportModal.js";
 function CreatePage() {
   const history = useHistory();
   const { user, isSignedIn } = useAuthState();
-  const { setErrorOptions, setMessageOptions, setInputOptions } = useAlertState();
+  const { setErrorOptions, setMessageOptions, setInputOptions, setConfirmOptions } = useAlertState();
 
   const isEditing = useLocation().pathname.startsWith("/rooms/edit/");
   const { code } = useParams();
@@ -123,7 +123,11 @@ function CreatePage() {
     });
   }
 
-  const deleteRoom = () => {
+  const deleteRoom = (confirm) => {
+    if(!confirm) {
+        return;
+    }
+
     fetch(process.env.REACT_APP_API_URL + "/room/delete", {
       method: "POST",
       headers: {
@@ -294,7 +298,13 @@ function CreatePage() {
               <Col className="text-right p-0">
                 <Button color="success" type="button" size="sm" onClick={() => setExportModal(true)}>Export</Button>
                 <Button color="primary" type="button" size="sm" onClick={() => setImportModal(true)}>Import</Button>
-                {isEditing && (<Button color="danger" type="button" size="sm" onClick={deleteRoom}>Delete</Button>)}
+                {isEditing && (<Button color="danger" type="button" size="sm" onClick={() => setConfirmOptions({
+                    title: "Confirm Deletion",
+                    body: "Are you sure you want to delete this room?",
+                    submit: deleteRoom,
+                    yesColor: "danger",
+                    noColor: "info"
+                })}>Delete</Button>)}
                 <Button color="info" type="button" size="sm" onClick={saveRoom}>Save</Button>
               </Col>
             </Row>

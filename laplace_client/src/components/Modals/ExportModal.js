@@ -28,6 +28,13 @@ function ExportModal({open, isOpen, data}){
         </div>
         <div className="modal-footer">
           <Button
+            color="info"
+            type="button"
+            onClick={() => navigator.clipboard.writeText(data) && open(false)}
+          >
+            Copy
+          </Button>
+          <Button
             color="danger"
             type="button"
             onClick={() => open(false)}

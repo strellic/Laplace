@@ -278,12 +278,12 @@ router.post("/delete", authenticate.requiresLogin, async (req, res) => {
 	}
 
 	Room.findById(check._id).populate("sections").populate("members").populate("author").exec(async (err, room) => {
-		let members = [...room.members, room.author];
+		let members = [...new Set([...room.members, room.author])];
 		for(let i = 0; i < members.length; i++) {
 			authenticate.getUser({_id: members[i]._id}, ["rooms"], async (err, user) => {
 				user.enrolled = user.enrolled.filter(e => e.code !== room.code);
 				user.created = user.created.filter(c => c.code !== room.code);
-				user.completed = user.completed.filter(c => c.room.code !== room.code);
+				user.completed = user.completed.filter(c => c.room?.code !== room.code);
 				await user.save();
 			});
 		}
@@ -362,7 +362,7 @@ router.post("/complete", authenticate.requiresLogin, async (req, res) => {
 	}
 
 	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
-	check.verify({user: user, res, ...req.body});
+	await check.verify({user: user, res, ...req.body});
 });
 
 router.post("/join", authenticate.requiresLogin, async (req, res) => {

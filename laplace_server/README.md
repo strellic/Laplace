@@ -1,4 +1,4 @@
-# hackbox_server
+# laplace_server
 The back-end of the Laplace webapp.
 Built using Express, Mongoose, and Dockerode.
 

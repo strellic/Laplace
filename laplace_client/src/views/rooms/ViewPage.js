@@ -114,12 +114,8 @@ function ViewPage() {
         setSection(sections[initial]);
         setNum(initial);
         nextSection = room.sections[initial];
-
-        if(nextSection.type === "info") {
-          checkCompletion(room, nextSection);
-        }
-
         setLoaded(true);
+        
         if(!nextSection) {
           history.push("/home");
           return <></>;

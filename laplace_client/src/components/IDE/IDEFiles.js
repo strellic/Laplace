@@ -287,8 +287,6 @@ function IDEFiles({save, active, setActive, size}) {
         name = name.replaceAll("/", "");
         let folder = (active.sideFolder || "/") + name + "/";
 
-        console.log(folder, active.sideFolder);
-
         if(active.files.find(f => f.folder === folder)) {
           return;
         }

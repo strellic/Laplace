@@ -16,14 +16,14 @@ const regexCompare = (regex, input, multiline = true, fail = false) => {
 	return (r.test(input) === !fail);
 }
 
-const complete = (user, room, section) => {
+const complete = async (user, room, section) => {
 	let index = user.completed.findIndex(entry => entry.room.code === room.code);
 	if(index === -1) {
 		index = user.completed.push({ room: room._id, sections: [] }) - 1;
 	}
 	if(!user.completed[index].sections.find(s => s.code === section.code)) {
 		user.completed[index].sections.push(section._id);
-		user.save();
+		await user.save();
 	}
 }
 
@@ -41,7 +41,7 @@ const coding = (emit, user, room, section, lang, files) => {
 	let passed = true;
 	let failed = 0;
 
-	sandbox.runLang(lang, files, stdins, (result) => {
+	sandbox.runLang(lang, files, stdins, async (result) => {
 		if(result.type !== "run")
 			return;
 
@@ -90,7 +90,7 @@ const coding = (emit, user, room, section, lang, files) => {
 			if(passed) {
 				emit({type: "stdout", msg: "\nNice job! You passed all of the checks."});
 				emit({type: "completed"});
-				complete(user, room, section);
+				await complete(user, room, section);
 			}
 			else {
 				emit({type: "stderr", msg: `\n${section.title} failed.\n${failed} / ${checks.length} checks failed.`});
@@ -99,7 +99,7 @@ const coding = (emit, user, room, section, lang, files) => {
 	});
 }
 
-const verify = ({ emit, res, user, room, section, token, lang, files, answer, answers, flag }) => {
+const verify = async ({ emit, res, user, room, section, token, lang, files, answer, answers, flag }) => {
 	let find;
 	if(user.enrolled.find(check => check.code === room)) {
 		find = user.enrolled.find(check => check.code === room);
@@ -125,7 +125,7 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, an
 		return error("You are not in that room.");
 	}
 
-	Room.findOne({ code: find.code }).populate("sections").exec((err, room) => {
+	Room.findOne({ code: find.code }).populate("sections").exec(async (err, room) => {
 		if(!room.sections.find(find => find.code === section)) {
 			return error("That section does not exist.");
 		}
@@ -143,21 +143,21 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, an
 		else if(section.type === "info"
             || (section.type === "coding" && section.coding.checks.length === 0)
             || section.type === "website") {
-			complete(user, room, section);
+			await complete(user, room, section);
 			return success("Section completed!");
 		}
 		else if(section.type === "quiz") {
             let correct = section.quiz.answers.filter(a => a.correct).map(a => a.choice);
 			if(section.quiz.all) {
                 if(JSON.stringify(correct.sort()) === JSON.stringify(answers.sort())) {
-                    complete(user, room, section);
+                    await complete(user, room, section);
                     return success("Section completed!");
                 }
             }
             else {
                 if((correct.length === 0 && !answer) 
                     || correct.includes(answer) ) {
-                    complete(user, room, section);
+                    await complete(user, room, section);
                     return success("Section completed!");
                 }
             }
@@ -165,7 +165,7 @@ const verify = ({ emit, res, user, room, section, token, lang, files, answer, an
 		}
 		else if(section.type === "flag") {
 			if(section.flag === flag) {
-				complete(user, room, section);
+				await complete(user, room, section);
 				return success("Section completed!");
 			}
 			return error("Incorrect answer!");

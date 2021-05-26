@@ -49,7 +49,7 @@ function RoomCard({ title, desc, completed, buttons = [] }) {
         {completed && (
           <div className="progress-container progress-success mb-2">
             <Progress max="100" value={progress}>
-              <span className="progress-value">{parseInt(progress)}%</span>
+              <span className="progress-value">{parseInt(progress) || 0}%</span>
             </Progress>
           </div>
         )}
