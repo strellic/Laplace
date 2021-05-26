@@ -14,8 +14,6 @@ import MarkdownIt from 'markdown-it'
 import MdEditor from 'react-markdown-editor-lite'
 import 'react-markdown-editor-lite/lib/index.css';
 
-import { Link } from "react-router-dom";
-
 import Insert from "components/MdEditor/Insert.js";
 
 import fetch from "utils/fetch.js";
@@ -382,7 +380,7 @@ function EditSection({open, isOpen, submit, section}){
 	          					<i className="fas fa-folder"></i> {folder.folder}
 	          					{folder.files.map((file, j) => (
 	          						<div key={j} className="ml-3">
-	          							<i className="fas fa-file"></i> <Link to={process.env.REACT_APP_API_URL + "/file/" + file.code}>{file.filename}</Link>
+	          							<i className="fas fa-file"></i> <a target="_blank" rel="noopener noreferrer" href={process.env.REACT_APP_API_URL + "/file/" + file.code}>{file.filename}</a>
 	          						</div>
 	          					))}
 	          				</div>

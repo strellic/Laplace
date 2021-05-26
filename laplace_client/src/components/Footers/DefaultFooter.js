@@ -15,11 +15,11 @@ function DefaultFooter() {
         <Container>
           <Row>
             <Col>
-                <Link to="https://github.com/strellic/Laplace"><i className="fab fa-github text-black"></i></Link>
+                <a target="_blank" rel="noopener noreferrer" href="https://github.com/strellic/Laplace"><i className="fab fa-github text-black"></i></a>
             </Col>
             <Col className="copyright text-right" id="copyright">
               © {new Date().getFullYear()}, designed by{" "}
-              <Link to="https://brycec.me">Bryce</Link>
+              <a target="_blank" rel="noopener noreferrer" href="https://brycec.me">Bryce</a>
               {" "}with ❤. 
             </Col>
           </Row>
