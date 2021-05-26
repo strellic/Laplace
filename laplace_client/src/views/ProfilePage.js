@@ -45,10 +45,12 @@ function ProfilePage() {
     if(!json.success) {
       return setErrorOptions({body: json.response, submit: () => {
         history.push("/profile");
+        history.go(0);
       }});
     }
     setMessageOptions({ body: json.response, submit: () => {
       history.push("/profile");
+      history.go(0);
     }});
   };
 

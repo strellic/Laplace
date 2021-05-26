@@ -199,7 +199,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
             start = clone(lang.template[0].files[0]);
 
           setActive({
-            files: clone(lang.template),
+            files: clone(lang.template).sort((a, b) => a.folder.localeCompare(b.folder)),
             folder: "/",
             file: start,
             lang: lang,

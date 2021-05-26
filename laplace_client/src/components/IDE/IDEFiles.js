@@ -156,6 +156,7 @@ function IDEFiles({save, active, setActive, size}) {
       title: "Rename File",
       body: "Enter new name below:",
       type: "input",
+      value: name,
       submit: callback,
     });
   }
@@ -228,6 +229,7 @@ function IDEFiles({save, active, setActive, size}) {
       title: "Rename Folder",
       body: "Enter new name below:",
       type: "input",
+      value: pathName.split("/")[pathName.split("/").length - 2],
       submit: callback,
     });
   }
@@ -285,6 +287,8 @@ function IDEFiles({save, active, setActive, size}) {
         name = name.replaceAll("/", "");
         let folder = (active.sideFolder || "/") + name + "/";
 
+        console.log(folder, active.sideFolder);
+
         if(active.files.find(f => f.folder === folder)) {
           return;
         }
@@ -293,6 +297,7 @@ function IDEFiles({save, active, setActive, size}) {
           folder: folder,
           files: []
         });
+        files = files.sort((a, b) => a.folder.localeCompare(b.folder));
         setActive({...active, files});
       }
     });

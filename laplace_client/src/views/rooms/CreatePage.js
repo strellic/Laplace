@@ -27,7 +27,6 @@ import SectionCard from "components/Cards/SectionCard.js";
 
 import PaginatedTable from "components/Form/PaginatedTable.js";
 
-import CreateSection from "components/Modals/CreateSection.js";
 import EditSection from "components/Modals/EditSection.js";
 import ExportModal from "components/Modals/ExportModal.js";
 import ImportModal from "components/Modals/ImportModal.js";
@@ -35,7 +34,7 @@ import ImportModal from "components/Modals/ImportModal.js";
 function CreatePage() {
   const history = useHistory();
   const { user, isSignedIn } = useAuthState();
-  const { setErrorOptions, setMessageOptions } = useAlertState();
+  const { setErrorOptions, setMessageOptions, setInputOptions } = useAlertState();
 
   const isEditing = useLocation().pathname.startsWith("/rooms/edit/");
   const { code } = useParams();
@@ -47,7 +46,6 @@ function CreatePage() {
 
   const [isPublic, setPublic] = React.useState(false);
 
-  const [createModal, setCreateModal] = React.useState(false);
   const [editModal, setEditModal] = React.useState(false);
   const [exportModal, setExportModal] = React.useState(false);
   const [importModal, setImportModal] = React.useState(false);
@@ -75,7 +73,7 @@ function CreatePage() {
     return {...section, onClick: editSection, onDelete: deleteSection}
   }
 
-  const createSection = ({ title }) => {
+  const createSection = (title) => {
     if(sectionsRef.current.find(section => section.title === title)) {
       return setErrorOptions({body: "A section already exists with that title."});
     }
@@ -209,7 +207,6 @@ function CreatePage() {
     <>
       <AuthNavbar />
       <div className="wrapper">
-        <CreateSection open={setCreateModal} isOpen={createModal} submit={createSection} />
         <EditSection open={setEditModal} isOpen={editModal} section={sectionRef.current} submit={finishSection} key={sectionRef.current.title} />
         <ExportModal open={setExportModal} isOpen={exportModal} data={JSON.stringify({title, desc, sections: sectionsRef.current, "public": isPublic}, null, " ".repeat(4))} />
         <ImportModal open={setImportModal} isOpen={importModal} submit={finishImport} />
@@ -266,7 +263,7 @@ function CreatePage() {
                   <SortableItem key={index} index={index} value={fixupSection(value)} />
                 ))}
               </SortableContainer>
-              <SectionCard title="Create Section" desc="Create a new section here." button="Create +" onClick={() => setCreateModal(true)}/>
+              <SectionCard title="Create Section" desc="Create a new section here." button="Create +" onClick={() => setInputOptions({title: "Enter Section Title:", body: "", submit: createSection})}/>
             </Row>
 
             {(isEditing && members && members.length > 0) && (

@@ -4,6 +4,7 @@ import {
   Input,
   Button,
   Modal,
+  Form,
   FormGroup
 } from "reactstrap";
 // core components
@@ -16,6 +17,10 @@ function InputModal({open, isOpen, submit, title="Input Data", body="Enter data 
 
     if(reset)
       setData("");
+  };
+  const onSubmit = (e) => {
+    e.preventDefault();
+    finish();
   };
   return (
     <>
@@ -34,14 +39,16 @@ function InputModal({open, isOpen, submit, title="Input Data", body="Enter data 
           </button>
         </div>
         <div className="modal-body">
-          <p>{body}</p>
-          <FormGroup>
-            <Input
-              type={type}
-              value={data || value}
-              onChange={e => setData(e.target.value)}
-            ></Input>
-          </FormGroup>
+          {body && <p>{body}</p>}
+          <Form onSubmit={onSubmit}>
+            <FormGroup>
+              <Input
+                type={type}
+                value={data || value}
+                onChange={e => setData(e.target.value)}
+              ></Input>
+            </FormGroup>
+          </Form>
         </div>
         <div className="modal-footer">
           <Button

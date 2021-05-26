@@ -40,7 +40,7 @@ function IndexHeader() {
               src={require("assets/img/logo.png")}
             ></img>
             <h1 className="h1-seo">Laplace</h1>
-            <h3>An open-source, collaborative, and free coding environment for everyone.</h3>
+            <h3>An open-source, collaborative, and free learning & coding environment for all.</h3>
           </div>
         </Container>
       </div>

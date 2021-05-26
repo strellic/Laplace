@@ -109,6 +109,7 @@ function ViewPage() {
           if(!room.sections[initial].completed) break;
           if(saved && saved === initial) break;
         }
+        initial = Math.min(initial, room.sections.length - 1);
 
         setSection(sections[initial]);
         setNum(initial);
@@ -319,7 +320,7 @@ function ViewPage() {
                   {RoomButtons(num)}
                 </div>
                 <div className={"bg-white p-0 " + ["c-half-r", "c-large-r", "c-small-r"][section.layout]}>
-                  <iframe className="w-100 h-100 border-0" ref={iframeRef} title="Interactive application"></iframe>
+                  <iframe className="w-100 h-100 border-0" ref={iframeRef} title="Interactive application" sandbox="allow-modals allow-scripts"></iframe>
                 </div>
               </>
             )}
