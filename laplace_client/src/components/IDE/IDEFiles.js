@@ -10,13 +10,13 @@ from "reactstrap";
 
 import { useAlertState } from "context/alert.js";
 
-function IDEFiles({save, active, setActive, size}) {
+function IDEFiles({active, setActive, size}) {
   const { setInputOptions, setConfirmOptions, setDragDropOptions } = useAlertState();
 
   const [sideOpen, setSideOpen] = React.useState(false);
 
   const SideFiles = (folder, padding, isFolder) => {
-    return active.files.find(f => f.folder === folder).files.map((file, i) => {
+    return active.files.find(f => f.folder === folder).files.sort((a, b) => a.filename.localeCompare(b.filename)).map((file, i) => {
       let isSelected = active.file && file.filename === active.file.filename && isFolder;
 
       return (
@@ -270,8 +270,9 @@ function IDEFiles({save, active, setActive, size}) {
   const newFileDialog = () => {
     setInputOptions({
       title: "New File",
-      body: "New File filename:",
+      body: "Enter new file name:",
       type: "input",
+      button: "Create",
       reset: true,
       submit: newFile 
     })
@@ -280,9 +281,10 @@ function IDEFiles({save, active, setActive, size}) {
   const newFolderDialog = () => {
     setInputOptions({
       title: "New Folder",
-      body: "New Folder filename:",
+      body: "Enter new folder name:",
       type: "input",
       reset: true,
+      button: "Create",
       submit: (name) => {
         name = name.replaceAll("/", "");
         let folder = (active.sideFolder || "/") + name + "/";
@@ -295,7 +297,6 @@ function IDEFiles({save, active, setActive, size}) {
           folder: folder,
           files: []
         });
-        files = files.sort((a, b) => a.folder.localeCompare(b.folder));
         setActive({...active, files});
       }
     });
@@ -320,7 +321,7 @@ function IDEFiles({save, active, setActive, size}) {
           <i className="fas fa-upload"></i>
         </div>
 
-        {active.loaded && active.files.filter(f => f.folder !== "/").map((location, i) => SideFolder(location.folder, i))}
+        {active.loaded && active.files.sort((a, b) => a.folder.localeCompare(b.folder)).filter(f => f.folder !== "/").map((location, i) => SideFolder(location.folder, i))}
         {active.loaded && SideFolder("/", 0, false)}  
       </div>
 

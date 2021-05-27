@@ -69,6 +69,11 @@ function EditSection({open, isOpen, submit, section}){
     });
   }, [isOpen, section.lang]);
 
+  React.useEffect(() => {
+    if(type !== "info" && layout === 3)
+      setLayout(0); 
+  }, [type, layout]);
+
   const showLangModal = () => {
     setSelectOptions({
       title: "Select Language",
@@ -227,6 +232,13 @@ function EditSection({open, isOpen, submit, section}){
                     <img alt="75 / 25" src={require("assets/img/section/layout2.png")} style={{"height": "4rem"}} />
                   </Button>
                 </div>
+                {type === "info" && (
+                  <div className="ml-3">
+                    <Button className="p-2" color={layout === 3 ? "info" : "secondary"} onClick={() => setLayout(3)}>
+                      <img alt="75 / 25" src={require("assets/img/section/layout3.png")} style={{"height": "4rem"}} />
+                    </Button>
+                  </div>
+                )}
               </div>
             </FormGroup>
           )}

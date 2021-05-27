@@ -32,7 +32,7 @@ html, body, #root {
 
 .room-col-text {
 	background-color: white !important;
-	overflow-y: scroll;
+	overflow-y: auto;
 	height: 100%;
 	padding: 0;
 	padding-bottom: 5rem !important;
@@ -56,8 +56,16 @@ html, body, #root {
 }
 
 .room-buttons {
-	float: right;
+	display: flex;
+    justify-content: flex-end;
 	padding-right: 1rem !important;
+}
+.room-col-text.w-100 > .room-buttons {
+    padding-right: 1.5rem !important;
+}
+
+.room-buttons > button:not(:last-child) {
+    margin-right: .5rem;
 }
 
 .room-output {
@@ -157,6 +165,7 @@ html, body, #root {
   	left: -50%;
   	transition: left 0.25s ease;
   	z-index: 5;
+    overflow-y: auto;
 }
 
 .ide-file-sidecontainer {
@@ -218,7 +227,7 @@ html, body, #root {
 }
 .file-list-container {
 	max-height: 70vh;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 .file-list-row {
 	padding: 0.25rem;

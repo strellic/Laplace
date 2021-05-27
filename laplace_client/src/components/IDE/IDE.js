@@ -199,7 +199,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
             start = clone(lang.template[0].files[0]);
 
           setActive({
-            files: clone(lang.template).sort((a, b) => a.folder.localeCompare(b.folder)),
+            files: clone(lang.template),
             folder: "/",
             file: start,
             lang: lang,
@@ -245,8 +245,9 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
 
   React.useEffect(() => {
     if(!useFileStorage && storageKey && active && active.loaded && active.file && active.files) {
-      if(JSON.stringify(active.lang.template) !== JSON.stringify(active.files))
-        storage.save(storageKey, active);
+      // if(JSON.stringify(active.lang.template) !== JSON.stringify(active.files))
+      // not sure if i want this check to be active or not...
+      storage.save(storageKey, active);
     }
 
     if(collab && status !== "disconnected" && !transferred.current) {

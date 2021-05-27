@@ -9,8 +9,10 @@ import {
 } from "reactstrap";
 // core components
 
-function InputModal({open, isOpen, submit, title="Input Data", body="Enter data below:", type="text", button="Save", reset=true, value=""}){
+function InputModal({open, isOpen, submit, title="Input Data", body="Enter data below:", type="text", button="Save", reset=true, value="", inputOptions={}}){
   const [data, setData] = React.useState(value);
+  const [inputEle, setInputEle] = React.useState(null);
+
   const finish = () => {
     submit(data);
     open(false);
@@ -18,10 +20,22 @@ function InputModal({open, isOpen, submit, title="Input Data", body="Enter data 
     if(reset)
       setData("");
   };
+
   const onSubmit = (e) => {
     e.preventDefault();
     finish();
   };
+
+  const inputRef = React.useCallback(node => {
+    setInputEle(node);
+  }, []);
+
+  React.useEffect(() => {
+    if(isOpen && inputEle) {
+      inputEle.focus();
+    }
+  }, [isOpen, inputEle]);
+
   return (
     <>
       <Modal toggle={() => open(false)} isOpen={isOpen}>
@@ -46,11 +60,23 @@ function InputModal({open, isOpen, submit, title="Input Data", body="Enter data 
                 type={type}
                 value={data || value}
                 onChange={e => setData(e.target.value)}
+                innerRef={inputRef}
+                {...inputOptions}
               ></Input>
             </FormGroup>
           </Form>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer justify-content-end">
+          {submit && (
+            <Button
+              color="info"
+              type="button"
+              onClick={finish}
+              className="mr-2"
+            >
+              {button}
+            </Button>
+          )}
           <Button
             color="danger"
             type="button"
@@ -58,15 +84,6 @@ function InputModal({open, isOpen, submit, title="Input Data", body="Enter data 
           >
             Close
           </Button>
-          {submit && (
-            <Button
-              color="info"
-              type="button"
-              onClick={finish}
-            >
-              {button}
-            </Button>
-          )}
         </div>
       </Modal>
     </>

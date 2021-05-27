@@ -26,11 +26,12 @@ function ExportModal({open, isOpen, data}){
         <div className="modal-body">
           <pre>{data}</pre>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer justify-content-end">
           <Button
             color="info"
             type="button"
             onClick={() => navigator.clipboard.writeText(data) && open(false)}
+            className="mr-2"
           >
             Copy
           </Button>

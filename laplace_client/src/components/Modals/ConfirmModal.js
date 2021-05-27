@@ -6,7 +6,7 @@ import {
 } from "reactstrap";
 // core components
 
-function ConfirmModal({open, isOpen, submit, yes = "Yes", no = "No", yesColor="success", noColor="danger", title, body}){
+function ConfirmModal({open, isOpen, submit, yes = "OK", no = "Cancel", yesColor="info", noColor="danger", title, body}){
   return (
     <>
       <Modal toggle={() => open(false)} isOpen={isOpen}>
@@ -26,22 +26,21 @@ function ConfirmModal({open, isOpen, submit, yes = "Yes", no = "No", yesColor="s
         <div className="modal-body">
           <p>{body}</p>
         </div>
-        <div className="mb-1 mr-4">
-          <Button
-            color={noColor}
-            type="button"
-            className="float-right"
-            onClick={() => {open(false); submit(false)}}
-          >
-            {no}
-          </Button>
+        <div className="modal-footer justify-content-end">
           <Button
             color={yesColor}
             type="button"
-            className="float-right"
             onClick={() => {open(false); submit(true)}}
+            className="mr-2"
           >
             {yes}
+          </Button>
+          <Button
+            color={noColor}
+            type="button"
+            onClick={() => {open(false); submit(false)}}
+          >
+            {no}
           </Button>
         </div>
       </Modal>

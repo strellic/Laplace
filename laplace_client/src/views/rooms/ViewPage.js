@@ -198,14 +198,14 @@ function ViewPage() {
           <Row className="p-0 h-100 room-content">
             {section.type === "info" && (
               <>
-                <div className={"room-col-text " + ["c-half-l", "c-small-l", "c-large-l"][section.layout]}>
+                <div className={"room-col-text " + ["c-half-l", "c-small-l", "c-large-l", "w-100"][section.layout]}>
                   <div className="mt-3 room-type">{section.type}</div>
                   <h6 className="title room-text">{room.title} ({num+1}/{room.sections.length})</h6>
                   <h5 className="title room-text">{section.title} {section.completed && <i className="fas fa-check text-success"></i>}</h5>
                   <Markdown className="room-text" markdown={section.markdown} />
                   {RoomButtons(num)}
                 </div>
-                <div className={["c-half-r", "c-large-r", "c-small-r"][section.layout]}>
+                <div className={["c-half-r", "c-large-r", "c-small-r", "d-none"][section.layout]}>
                   <div className="d-flex below-navbar justify-content-center align-items-center">
                     {section.info?.image ? (
                       <img

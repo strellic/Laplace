@@ -42,7 +42,15 @@ function ImportModal({open, isOpen, submit}){
             ></Input>
           </FormGroup>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer justify-content-end">
+          <Button
+            color="info"
+            type="button"
+            onClick={finish}
+            className="mr-2"
+          >
+            Import
+          </Button>
           <Button
             color="danger"
             type="button"
@@ -50,13 +58,7 @@ function ImportModal({open, isOpen, submit}){
           >
             Close
           </Button>
-          <Button
-            color="info"
-            type="button"
-            onClick={finish}
-          >
-            Import
-          </Button>
+          
         </div>
       </Modal>
     </>

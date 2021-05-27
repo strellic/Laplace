@@ -24,11 +24,13 @@ function PaginatedTable({ columns, items, pageSize = 5 }) {
 
   const { setInputOptions } = useAlertState();
 
+  const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
   const back = () => {
-    setPage(Math.max(0, page - 1));
+    setPage(clamp(page - 1, 0, pageCount - 1));
   };
   const forward = () => {
-    setPage(Math.min(pageCount - 1, page + 1));
+    setPage(clamp(page + 1, 0, pageCount - 1));
   };
 
   return (
@@ -53,28 +55,36 @@ function PaginatedTable({ columns, items, pageSize = 5 }) {
       </Table>
 
       <Pagination>
+
         <PaginationItem>
           <PaginationLink first onClick={() => setPage(0)} />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink previous onClick={back} />
         </PaginationItem>
-          <PaginationItem active>
-            <PaginationLink onClick={() => setInputOptions({
-              title: "Input page number",
-              body: "Enter page number below:",
-              type: "number",
-              button: "Navigate",
-              value: `${page+1}`,
-              submit: (p) => setPage(parseInt(p) - 1)
-            })}>{page + 1}</PaginationLink>
-          </PaginationItem>
+
+        <PaginationItem active>
+          <PaginationLink onClick={() => setInputOptions({
+            title: "Input page number",
+            body: "Enter page number below:",
+            type: "number",
+            button: "Navigate",
+            value: `${page+1}`,
+            submit: (p) => setPage(clamp(parseInt(p) - 1, 0, pageCount - 1)),
+            inputOptions: {
+              min: 1,
+              max: pageCount
+            }
+          })}>{page + 1}</PaginationLink>
+        </PaginationItem>
+
         <PaginationItem>
           <PaginationLink next onClick={forward} />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink last onClick={() => setPage(pageCount - 1)} />
         </PaginationItem>
+
       </Pagination>
       <p>Showing items <strong>{page * pageSize} - {(page + 1) * pageSize}</strong> of <strong>{items.length}</strong></p>
     </>

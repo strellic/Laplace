@@ -31,7 +31,7 @@ function MessageModal({open, isOpen, title, body, submit}){
         <div className="modal-body">
           <p>{body}</p>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer justify-content-end">
           <Button
             color="danger"
             type="button"

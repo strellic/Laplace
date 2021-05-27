@@ -42,20 +42,21 @@ function SelectModal({open, isOpen, submit, title="Select Choice", body="Select 
             </Input>
           </FormGroup>
         </div>
-        <div className="modal-footer">
+        <div className="modal-footer justify-content-end">
+          <Button
+            color="info"
+            type="button"
+            onClick={finish}
+            className="mr-2"
+          >
+            {button}
+          </Button>
           <Button
             color="danger"
             type="button"
             onClick={() => open(false)}
           >
             Close
-          </Button>
-          <Button
-            color="info"
-            type="button"
-            onClick={finish}
-          >
-            {button}
           </Button>
         </div>
       </Modal>

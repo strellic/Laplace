@@ -91,30 +91,31 @@ function DragDropModal({open, isOpen, submit, title="Upload Files", type="text",
           <div className="container">
             <div {...getRootProps({style})}>
               <input {...getInputProps()} />
-              <p>Drag & Drop / Click Here</p>
-              <p>Max Size: {maxSize/1024/1024} MB</p>
+              <p className="text-center">Drag & Drop / Click Here<br />
+                 Max Size: {maxSize/1024/1024} MB</p>
             </div>
             <br />
             <aside>
-              {multiple ? <h6>Files</h6> : <h6>File</h6>}
+              {multiple ? <h6>Files:</h6> : <h6>File:</h6>}
               <ul>{acceptedFileItems}</ul>
             </aside>
           </div>
+        </div>
+        <div className="modal-footer justify-content-end">
           <Button
-            color="danger"
+            color="info"
             type="button"
-            className="float-right"
-            onClick={() => finish(false)}
-          >
-            Close
-          </Button>
-          <Button
-            color="success"
-            type="button"
-            className="float-right"
+            className="mr-2"
             onClick={() => finish(true)}
           >
             Submit
+          </Button>
+          <Button
+            color="danger"
+            type="button"
+            onClick={() => finish(false)}
+          >
+            Close
           </Button>
         </div>
       </Modal>
