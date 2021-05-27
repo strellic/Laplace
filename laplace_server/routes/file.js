@@ -169,10 +169,8 @@ router.post("/del_folder", authenticate.requiresLogin, async (req, res) => {
     let folders = req.user.storage.filter(s => s.folder.startsWith(req.body.folder));
     let files = [];
 
-    let size = 0;
     for(let folder of folders) {
         files = files.concat(folder.files.map(f => f.code));
-        size += files.reduce((a, v) => a += v.size, 0);
     }
 
     File.deleteMany({owner: req.user, code: {$in: files}}, async (err) => {

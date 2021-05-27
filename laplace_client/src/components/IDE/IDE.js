@@ -34,7 +34,12 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
   const [status, setStatus] = React.useState("disconnected");
   const [ws, setWS] = React.useState(null);
   const connectWS = React.useCallback(() => {
+    if(ws && [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.readyState)) {
+      return;
+    }
+
     let socket = new WebSocket(process.env.REACT_APP_API_URL.replace("https", "wss").replace("http", "ws") + "/ws");
+
     socket.onopen = () => {
       if(status === "disconnected")
         setStatus("connected");
@@ -43,7 +48,12 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
       setStatus("disconnected");
     }
     setWS(socket);
-  }, [status]);
+
+    return () => {
+      ws.close();
+    };
+  }, [ws, status]);
+
   React.useEffect(() => {
     connectWS();
   }, [connectWS]);
@@ -356,7 +366,7 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
 
   return (
     <>
-      <Col className={size === "normal" ? "col-4 ide" : "col-6 ide pl-3"}>
+      <Col sm="12" className={size === "normal" ? "col-md-4 ide" : "col-md-6 ide"}>
         <div className="ide-top-files" ref={codeTopRef}>
           <IDEFiles active={active} setActive={setActive} size={size} />
         </div>
@@ -424,14 +434,14 @@ function IDE({navbarRef, checks, storageKey = null, useFileStorage = false, room
           )}
         </div>
       </Col>
-      <Col className={size === "normal" ? "col-4 room-output p-0" : "col-6 room-output p-0"}>
+      <Col sm="12" className={size === "normal" ? "col-md-4 room-output p-0" : "col-md-6 room-output p-0"}>
         <div className="ide-top">
           {active.lang && active.lang.name ? active.lang.name : "Loading..."}
           {status === "connected" && <Badge color="success" className="m-0 mr-2 ide-badge float-right">Connected<i className="fas fa-check ml-2"></i></Badge>}
           {status === "pending" && <Badge color="warning" className="m-0 mr-2 ide-badge float-right">Sending<Spinner size="sm" type="grow" className="ml-2 ide-grow" /></Badge>}
           {status === "disconnected" && <Badge color="danger" className="m-0 mr-2 ide-badge float-right">Disconnected<i className="fas fa-times ml-2"></i></Badge>}
         </div>
-        <div className="p-3">
+        <div className="p-3 room-terminal">
           {active.output && active.output.map((message, i) => (
             message.type === "stdout" ? <div key={i}>{message.content}</div> : <div key={i} className="room-output-error">{message.content}</div>
           ))}

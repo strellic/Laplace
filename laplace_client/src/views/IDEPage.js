@@ -84,7 +84,7 @@ function IDEPage() {
   return (
     <div className="room-wrapper">
       <Navbar transparent={false} fixed={false} className="mb-0" innerRef={navbarRef} />
-      <Row className="p-0 h-100">
+      <Row className="p-0 m-0 h-100">
         <IDE
           size="full"
           useFileStorage={true}

@@ -192,13 +192,13 @@ function ViewPage() {
   );
 
   return (
-    <div className="room-wrapper">
+    <div className="room-wrapper h-100">
       <Confetti width={width} height={height} run={confetti} recycle={confettiActive} onConfettiComplete={() => {setConfetti(false); setConfettiActive(true)}} />
       <Navbar transparent={false} fixed={false} className="mb-0" innerRef={navbarRef} />
-          <Row className="p-0 h-100 room-content">
+          <Row className="p-0 m-0 below-navbar room-content">
             {section.type === "info" && (
               <>
-                <div className={"room-col-text " + ["c-half-l", "c-small-l", "c-large-l", "w-100"][section.layout]}>
+                <div className={"room-col-text " + ["c-half-l", "c-small-l", "c-large-l", "vw-100"][section.layout]}>
                   <div className="mt-3 room-type">{section.type}</div>
                   <h6 className="title room-text">{room.title} ({num+1}/{room.sections.length})</h6>
                   <h5 className="title room-text">{section.title} {section.completed && <i className="fas fa-check text-success"></i>}</h5>
@@ -206,7 +206,7 @@ function ViewPage() {
                   {RoomButtons(num)}
                 </div>
                 <div className={["c-half-r", "c-large-r", "c-small-r", "d-none"][section.layout]}>
-                  <div className="d-flex below-navbar justify-content-center align-items-center">
+                  <div className="d-flex h-100 justify-content-center align-items-center">
                     {section.info?.image ? (
                       <img
                         src={process.env.REACT_APP_API_URL + "/file/" + section.info.image.code}
@@ -217,7 +217,7 @@ function ViewPage() {
                       <img
                         src={require("assets/img/logo.png")}
                         alt="Laplace logo"
-                        className="c-info-img"
+                        className="c-info-img c-hide-on-small"
                       ></img>
                     )}
                   </div>
@@ -226,7 +226,7 @@ function ViewPage() {
             )}
             {section.type === "coding" && (
               <>
-                <Col className="room-col-text col-4">
+                <Col className="room-col-text col-md-4" sm="12">
                   <div className="mt-3 room-type">{section.type}</div>
                   <h6 className="title room-text">{room.title} ({num+1}/{room.sections.length})</h6>
                   <h5 className="title room-text">{section.title} {section.completed && <i className="fas fa-check text-success"></i>}</h5>
@@ -315,8 +315,8 @@ function ViewPage() {
                   <Markdown className="room-text" markdown={section.markdown} />
                   {RoomButtons(num)}
                 </div>
-                <div className={"bg-white p-0 " + ["c-half-r", "c-large-r", "c-small-r"][section.layout]}>
-                  <iframe className="w-100 h-100 border-0" ref={iframeRef} title="Interactive application" sandbox="allow-modals allow-scripts"></iframe>
+                <div className={"bg-white p-0 h-100 " + ["c-half-r", "c-large-r", "c-small-r"][section.layout]}>
+                  <iframe className="w-100 border-0 h-100" ref={iframeRef} title="Interactive application" sandbox="allow-modals allow-scripts"></iframe>
                 </div>
               </>
             )}

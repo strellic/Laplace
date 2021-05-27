@@ -24,19 +24,16 @@ html, body, #root {
 	height: 100%;
 }
 
-.room-wrapper {
-	background-color: #1d2d6b;
-	height: 100vh;
-	overflow: hidden;
-}
-
 .room-col-text {
 	background-color: white !important;
 	overflow-y: auto;
 	height: 100%;
 	padding: 0;
-	padding-bottom: 5rem !important;
+	padding-bottom: 5rem;
 	z-index:10;
+}
+.room-col-text.w-100 {
+    padding-bottom: 0;
 }
 
 .room-type {
@@ -44,24 +41,21 @@ html, body, #root {
 	width: 100%;
 	margin: 0 !important;
 	padding: .75rem !important;
-	padding-left: 2.25rem !important;
+	padding-left: 1rem !important;
 	text-transform: capitalize;
 }
 
 .room-text {
 	margin: 0;
 	padding-top: 1rem !important;
-	padding-left: 2rem !important;
+	padding-left: 1rem !important;
 	padding-right: 1rem !important;
 }
 
 .room-buttons {
 	display: flex;
     justify-content: flex-end;
-	padding-right: 1rem !important;
-}
-.room-col-text.w-100 > .room-buttons {
-    padding-right: 1.5rem !important;
+	margin-right: 1rem !important;
 }
 
 .room-buttons > button:not(:last-child) {
@@ -252,6 +246,10 @@ p, span, h1, h2, h3, h4, h5, h6 {
 .below-navbar {
     height: calc(100% - 4rem) !important;
 }
+.room-wrapper {
+    background-color: #1d2d6b;
+}
+
 .room-content {
     flex: 1 0 auto;
     position: relative;
@@ -283,8 +281,59 @@ p, span, h1, h2, h3, h4, h5, h6 {
     inset: 0% 0% 0% 33.3333%;
 }
 
+.c-mid {
+    position: absolute;
+    inset: 0% 33.3333% 0% 33.3333%;
+}
+
+@media only screen and (max-width: 768px) {
+    .c-half-l, .c-small-l, .c-large-l, .c-half-r, .c-small-r, .c-large-r, .c-mid {
+        position: relative;
+        width: 100%;
+        inset: 0;
+    }
+    .room-col-text {
+        height: initial;
+    }
+    .c-hide-on-small {
+        display: none;
+    }
+    .room-output {
+        height: 100vh;
+    }
+    .room-terminal {
+        padding-left: 1rem !important;
+    }
+}
+
 .c-info-img {
-    height: 66%;
+    max-height: 66%;
     width: auto;
     margin: 0 auto;
 }
+
+div.vw-100 > div.room-text > .section-embed {
+    max-width: 75%;
+}
+
+/* https://codepen.io/GhostRider/pen/GHaFw */
+::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+  width: 10px;
+  background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+  background-color: #4568dc;
+  background-image: -webkit-gradient(to left, 0 0, 0 100%,
+                     color-stop(.5, rgba(255, 255, 255, .2)),
+             color-stop(.5, transparent), to(transparent));
+}
+

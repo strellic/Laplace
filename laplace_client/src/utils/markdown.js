@@ -49,14 +49,14 @@ const markdown = (content) => {
           let wrapper = document.createElement("div");
           let iframe = document.createElement("iframe");
 
-          wrapper.className = "embed-responsive embed-responsive-16by9";
+          wrapper.className = "embed-responsive embed-responsive-16by9 section-embed";
           iframe.className = "embed-responsive-item b-0";
           iframe.allow = "autoplay; picture-in-picture; fullscreen";
           iframe.src = `https://www.youtube.com/embed/${id}`;
 
           wrapper.appendChild(iframe);
 
-          return wrapper.outerHTML + '<div class="text-center font-weight-light">';
+          return wrapper.outerHTML + '<div class="text-center font-weight-light section-embed">';
         }
         return '';
       }
@@ -81,7 +81,7 @@ const markdown = (content) => {
           let video = document.createElement("video");
           let source = document.createElement("source");
 
-          wrapper.className = "embed-responsive embed-responsive-16by9";
+          wrapper.className = "embed-responsive embed-responsive-16by9 section-embed";
           video.className = "embed-responsive-item b-0";
           video.controls = true;
           source.src = url;
@@ -89,7 +89,7 @@ const markdown = (content) => {
           video.appendChild(source);
           wrapper.appendChild(video);
 
-          return wrapper.outerHTML + '<div class="text-center font-weight-light">';
+          return wrapper.outerHTML + '<div class="text-center font-weight-light section-embed">';
         }
         return '';
       }
