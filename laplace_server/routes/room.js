@@ -152,191 +152,191 @@ const ROOM_SCHEMA = {
 };
 
 router.get("/count", async (req, res) => {
-	let rooms = await Room.find({});
-	return res.json(response.success({
-		count: rooms.length
-	}));
+    let rooms = await Room.find({});
+    return res.json(response.success({
+        count: rooms.length
+    }));
 });
 
 router.post("/create", authenticate.requiresLogin, async (req, res) => {
-	let roomData = req.body.roomData;
-	let result = ajv.validate(ROOM_SCHEMA, roomData);
+    let roomData = req.body.roomData;
+    let result = ajv.validate(ROOM_SCHEMA, roomData);
 
-	if(!result) {
-		return res.json(response.failure("There was an error processing the data: " + ajv.errorsText()));
-	}
+    if(!result) {
+        return res.json(response.failure("There was an error processing the data: " + ajv.errorsText()));
+    }
 
-	try {
-		let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
-		let room = new Room({
-			title: roomData.title,
-			desc: roomData.desc,
-			code: uuidv4(),
-			author: user,
+    try {
+        let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+        let room = new Room({
+            title: roomData.title,
+            desc: roomData.desc,
+            code: uuidv4(),
+            author: user,
             public: roomData.public
-		});
+        });
 
-		let sections = [];
-		for(let i = 0; i < roomData.sections.length; i++) {
-			let section = new Section(roomData.sections[i]);
+        let sections = [];
+        for(let i = 0; i < roomData.sections.length; i++) {
+            let section = new Section(roomData.sections[i]);
             section.code = uuidv4();
-			section.room = room;
-			await section.save();
-			sections.push(section);
-		}
+            section.room = room;
+            await section.save();
+            sections.push(section);
+        }
 
-		room.sections = sections;
-		await room.save();
+        room.sections = sections;
+        await room.save();
 
-		user.created.push(room);
-		await user.save();
+        user.created.push(room);
+        await user.save();
 
-		return res.json(response.success("Room created successfully."));
-	}
-	catch(err) {
+        return res.json(response.success("Room created successfully."));
+    }
+    catch(err) {
         console.log(err);
-		return res.json(response.failure("There was an error saving your room. Please try again."));
-	}
+        return res.json(response.failure("There was an error saving your room. Please try again."));
+    }
 });
 
 router.post("/edit", authenticate.requiresLogin, async (req, res) => {
-	let roomData = req.body.roomData;
+    let roomData = req.body.roomData;
 
-	let result = ajv.validate(ROOM_SCHEMA, roomData);
-	if(!result) {
-		return res.json(response.failure("There was an error processing the data: " + ajv.errorsText()));
-	}
+    let result = ajv.validate(ROOM_SCHEMA, roomData);
+    if(!result) {
+        return res.json(response.failure("There was an error processing the data: " + ajv.errorsText()));
+    }
 
-	let code = req.body.code;
-	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+    let code = req.body.code;
+    let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
 
-	let check = user.created.find(check => check.code === code);
-	if(!check) {
-		return res.json(response.failure("You do not have a room with that code."));
-	}
+    let check = user.created.find(check => check.code === code);
+    if(!check) {
+        return res.json(response.failure("You do not have a room with that code."));
+    }
 
-	Room.findById(check._id).populate("sections").exec(async (err, room) => {
-		room.title = roomData.title;
-		room.desc = roomData.desc;
+    Room.findById(check._id).populate("sections").exec(async (err, room) => {
+        room.title = roomData.title;
+        room.desc = roomData.desc;
 
-		let sections = [];
-		for(let i = 0; i < roomData.sections.length; i++) {
-			let sectionData = roomData.sections[i];
-			if(sectionData.code && room.sections.find(section => section.code === sectionData.code)) {
-				let section = await Section.findByIdAndUpdate(room.sections.find(section => section.code === sectionData.code)._id, sectionData, { overwrite: true, new: true });
-				sections.push(section);
-			}
-			else {
-				let section = new Section(sectionData);
+        let sections = [];
+        for(let i = 0; i < roomData.sections.length; i++) {
+            let sectionData = roomData.sections[i];
+            if(sectionData.code && room.sections.find(section => section.code === sectionData.code)) {
+                let section = await Section.findByIdAndUpdate(room.sections.find(section => section.code === sectionData.code)._id, sectionData, { overwrite: true, new: true });
+                sections.push(section);
+            }
+            else {
+                let section = new Section(sectionData);
                 section.code = uuidv4();
-				section.room = room;	
-				sections.push(section);
-				await section.save();
-			}
-		}
+                section.room = room;    
+                sections.push(section);
+                await section.save();
+            }
+        }
 
-		let remove = {
-			ids: [],
-			codes: []
-		};
-		for(let i = 0; i < room.sections.length; i++) {
-			if(!sections.find(section => section.code === room.sections[i].code)) {
-				remove.ids.push(room.sections[i]._id);
-				remove.codes.push(room.sections[i].code);
-			}
-		}
+        let remove = {
+            ids: [],
+            codes: []
+        };
+        for(let i = 0; i < room.sections.length; i++) {
+            if(!sections.find(section => section.code === room.sections[i].code)) {
+                remove.ids.push(room.sections[i]._id);
+                remove.codes.push(room.sections[i].code);
+            }
+        }
 
-		room.sections = sections;
+        room.sections = sections;
         room.public = roomData.public;
-		await room.save();
+        await room.save();
 
-		if(remove.ids.length > 0) {
-			let members = [...room.members, room.author];
-			for(let i = 0; i < members.length; i++) {
-				let user = await authenticate.getUser({_id: members[i]}, ["rooms"]);
-				for(let j = 0; j < user.completed.length; j++) {
-					if(user.completed[j].room.code === room.code) {
-						user.completed[j].sections = user.completed[j].sections.filter(sec => !remove.codes.includes(sec.code));
-						await user.save();
-					}
-				}
-			}
-		}
+        if(remove.ids.length > 0) {
+            let members = [...room.members, room.author];
+            for(let i = 0; i < members.length; i++) {
+                let user = await authenticate.getUser({_id: members[i]}, ["rooms"]);
+                for(let j = 0; j < user.completed.length; j++) {
+                    if(user.completed[j].room.code === room.code) {
+                        user.completed[j].sections = user.completed[j].sections.filter(sec => !remove.codes.includes(sec.code));
+                        await user.save();
+                    }
+                }
+            }
+        }
 
-		await Section.deleteMany({_id: {$in: remove.ids}});
-		return res.json(response.success("Room updated successfully."));
-	});
+        await Section.deleteMany({_id: {$in: remove.ids}});
+        return res.json(response.success("Room updated successfully."));
+    });
 });
 
 router.post("/delete", authenticate.requiresLogin, async (req, res) => {
-	let code = req.body.code;
-	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+    let code = req.body.code;
+    let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
 
-	let check = user.created.find(check => check.code === code);
-	if(!check) {
-		return res.json(response.failure("You do not have a room with that code."));
-	}
+    let check = user.created.find(check => check.code === code);
+    if(!check) {
+        return res.json(response.failure("You do not have a room with that code."));
+    }
 
-	Room.findById(check._id).populate("sections").populate("members").populate("author").exec(async (err, room) => {
-		let members = [...new Set([...room.members, room.author])];
+    Room.findById(check._id).populate("sections").populate("members").populate("author").exec(async (err, room) => {
+        let members = [...new Set([...room.members, room.author])];
 
-		for(let i = 0; i < members.length; i++) {
-			let member = await authenticate.getUser({_id: members[i]._id}, ["rooms"]);
-			member.enrolled = member.enrolled.filter(e => e.code !== room.code);
-			member.created = member.created.filter(c => c.code !== room.code);
-			member.completed = member.completed.filter(c => c.room?.code !== room.code);
-			await member.save();
-		}
+        for(let i = 0; i < members.length; i++) {
+            let member = await authenticate.getUser({_id: members[i]._id}, ["rooms"]);
+            member.enrolled = member.enrolled.filter(e => e.code !== room.code);
+            member.created = member.created.filter(c => c.code !== room.code);
+            member.completed = member.completed.filter(c => c.room?.code !== room.code);
+            await member.save();
+        }
         
-		for(let i = 0; i < room.sections.length; i++) {
-			await room.sections[i].delete();
-		}
-		await room.delete();
+        for(let i = 0; i < room.sections.length; i++) {
+            await room.sections[i].delete();
+        }
+        await room.delete();
 
-		return res.json(response.success("Room deleted successfully."));
-	});
+        return res.json(response.success("Room deleted successfully."));
+    });
 });
 
 router.post("/info", authenticate.requiresLogin, async (req, res) => {
-	let code = req.body.code;
-	if (!code || typeof code !== 'string') {
-		return res.json(response.failure("Missing code."));
-	}
+    let code = req.body.code;
+    if (!code || typeof code !== 'string') {
+        return res.json(response.failure("Missing code."));
+    }
 
-	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+    let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
 
-	Room.findOne({ code })
+    Room.findOne({ code })
     .populate("sections")
     .populate({path: "members", populate: {path: "completed", populate: {path: "room sections" }}})
     .populate("author").exec((err, room) => {
-		if(err || !room) {
-			return res.json(response.failure("Unable to find room."));
-		}
+        if(err || !room) {
+            return res.json(response.failure("Unable to find room."));
+        }
 
-		let clone = response.sanitize(room);
+        let clone = response.sanitize(room);
 
-		clone.author = clone.author.username;
+        clone.author = clone.author.username;
 
-		let completed = user.completed.find(c => c.room.code === room.code);
+        let completed = user.completed.find(c => c.room.code === room.code);
 
-		for(let i = 0; i < clone.sections.length; i++) {
-			if(completed && completed.sections.find(s => s.code === clone.sections[i].code))
-				clone.sections[i].completed = true;
-			else
-				clone.sections[i].completed = false;		
-		}
+        for(let i = 0; i < clone.sections.length; i++) {
+            if(completed && completed.sections.find(s => s.code === clone.sections[i].code))
+                clone.sections[i].completed = true;
+            else
+                clone.sections[i].completed = false;        
+        }
 
-		if(user.username !== clone.author) {
-			clone.sections = response.sanitize(clone.sections, ["flag"]);
-			for(let i = 0; i < clone.sections.length; i++) {
-				if(clone.sections[i].type === "coding")
-					clone.sections[i].coding.checks = clone.sections[i].coding.checks.map(c => true); 
-				if(clone.sections[i].type === "quiz") {
-					clone.sections[i].quiz.answers = clone.sections[i].quiz.answers.map(answer => ({choice: answer.choice}));
-				}
-			}
+        if(user.username !== clone.author) {
+            clone.sections = response.sanitize(clone.sections, ["flag"]);
+            for(let i = 0; i < clone.sections.length; i++) {
+                if(clone.sections[i].type === "coding")
+                    clone.sections[i].coding.checks = clone.sections[i].coding.checks.map(c => true); 
+                if(clone.sections[i].type === "quiz") {
+                    clone.sections[i].quiz.answers = clone.sections[i].quiz.answers.map(answer => ({choice: answer.choice}));
+                }
+            }
             delete clone.members;
-		}
+        }
         else {
             clone.members = clone.members.map(m => ({
                 username: m.username,
@@ -344,52 +344,52 @@ router.post("/info", authenticate.requiresLogin, async (req, res) => {
             }));
         }
 
-		clone.sections = response.sanitize(clone.sections, ["room"]);
+        clone.sections = response.sanitize(clone.sections, ["room"]);
         for(let i = 0; i < clone.sections.length; i++) {
             for(let type of SECTION_TYPES.filter(t => t !== clone.sections[i].type))
                 delete clone.sections[i][type]; 
         }
 
-		return res.json(response.success(clone));
-	});
+        return res.json(response.success(clone));
+    });
 });
 
 router.post("/complete", authenticate.requiresLogin, async (req, res) => {
-	if(!req.body.room || typeof req.body.room !== 'string') {
-		return res.json(response.failure("Missing room."));
-	}
-	if(!req.body.section || typeof req.body.section !== 'string') {
-		return res.json(response.failure("Missing section."));
-	}
+    if(!req.body.room || typeof req.body.room !== 'string') {
+        return res.json(response.failure("Missing room."));
+    }
+    if(!req.body.section || typeof req.body.section !== 'string') {
+        return res.json(response.failure("Missing section."));
+    }
 
-	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
-	await check.verify({user: user, res, ...req.body});
+    let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+    await check.verify({user: user, res, ...req.body});
 });
 
 router.post("/join", authenticate.requiresLogin, async (req, res) => {
-	if(!req.body.code || typeof req.body.code !== 'string') {
-		return res.json(response.failure("Missing room."));
-	}
+    if(!req.body.code || typeof req.body.code !== 'string') {
+        return res.json(response.failure("Missing room."));
+    }
 
-	let code = req.body.code;
-	let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
+    let code = req.body.code;
+    let user = await authenticate.getUser({username: req.jwt.username}, ["rooms"]);
 
-	if(user.enrolled.find(r => r.code === code) || user.created.find(r => r.code === code)) {
-		return res.json(response.failure("You are already in that room."));
-	}
+    if(user.enrolled.find(r => r.code === code) || user.created.find(r => r.code === code)) {
+        return res.json(response.failure("You are already in that room."));
+    }
 
-	Room.findOne({ code }, (err, room) => {
-		if(err || !room) {
-			return res.json(response.failure("Unable to find room."));
-		}
+    Room.findOne({ code }, (err, room) => {
+        if(err || !room) {
+            return res.json(response.failure("Unable to find room."));
+        }
 
-		user.enrolled.push(room);
+        user.enrolled.push(room);
         room.members.push(user);
         room.save();
-		user.save();
+        user.save();
 
-		return res.json(response.success("You have successfully joined the room."));
-	});
+        return res.json(response.success("You have successfully joined the room."));
+    });
 });
 
 router.get("/list", async (req, res) => {

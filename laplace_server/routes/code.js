@@ -6,7 +6,7 @@ import sandbox from "../src/sandbox.js";
 const router = express.Router();
 
 router.get("/langs", async (req, res) => {
-	return res.json(response.success(sandbox.settings.langs));
+    return res.json(response.success(sandbox.settings.langs));
 });
 
 export default router;
