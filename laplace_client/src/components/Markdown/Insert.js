@@ -26,9 +26,12 @@ export default class Insert extends PluginComponent {
     let url = process.env.REACT_APP_API_URL + "/file/" + file.code;
     let insert = `[${file.filename}](${url})\n`;
 
-    let images = ["png", "gif", "jpeg", "jpg", "jfif", "svg", "webp"];
+    let extension = file.filename.split(".").pop();
 
-    if(images.includes(file.filename.split(".").pop())) {
+    let images = ["png", "gif", "jpeg", "jpg", "jfif", "svg", "webp"];
+    let videos = ["mp4", "webm", "ogg"];
+
+    if(images.includes(extension) || videos.includes(extension)) {
       insert = "!" + insert;
     }
     this.editor.insertText(insert);

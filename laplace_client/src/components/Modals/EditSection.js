@@ -10,11 +10,12 @@ import {
   Label
 } from "reactstrap";
 // core components
-import MarkdownIt from 'markdown-it'
 import MdEditor from 'react-markdown-editor-lite'
 import 'react-markdown-editor-lite/lib/index.css';
+import Insert from "components/Markdown/Insert.js";
+import ExternalMedia from "components/Markdown/ExternalMedia.js";
 
-import Insert from "components/MdEditor/Insert.js";
+import markdownify from "utils/markdown.js";
 
 import fetch from "utils/fetch.js";
 import { useAlertState } from "context/alert.js";
@@ -82,7 +83,7 @@ function EditSection({open, isOpen, submit, section}){
   }
 
   MdEditor.use(Insert);
-  const mdParser = new MarkdownIt();
+  MdEditor.use(ExternalMedia);
 
   const finish = async () => {
     let completed = {
@@ -203,7 +204,7 @@ function EditSection({open, isOpen, submit, section}){
             <MdEditor
               style={{ height: "500px" }}
               value={markdown}
-              renderHTML={(text) => mdParser.render(text)}
+              renderHTML={(text) => markdownify(text)}
               onChange={({html, text}) => setMarkdown(text)}
             />
           </FormGroup>

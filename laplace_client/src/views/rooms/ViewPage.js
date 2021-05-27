@@ -21,7 +21,7 @@ import storage from "utils/storage.js";
 
 // core components
 import Navbar from "components/Navbars/Navbar.js";
-import Markdown from "components/Markdown.js";
+import Markdown from "components/Markdown/Markdown.js";
 import IDE from "components/IDE/IDE.js";
 
 function ViewPage() {
@@ -115,7 +115,7 @@ function ViewPage() {
         setNum(initial);
         nextSection = room.sections[initial];
         setLoaded(true);
-        
+
         if(!nextSection) {
           history.push("/home");
           return <></>;
